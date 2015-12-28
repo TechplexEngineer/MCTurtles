@@ -4,6 +4,9 @@ Scriptable Mining Turtles for Bukkit/Spigot Minecraft Server
 
 The goal of this project is to build a tool that educators can use to teach introductory programming using Turtles (similar to logo) in Minecraft. This plugin requires no client mods as it uses only the Bukkit/Spigot api.
 
+Loosely based on code from [Nubebuster](https://github.com/Nubebuster/Mining-Turtles)
+This repo replaces [Mining-Turtles](https://github.com/TechplexEngineer/Mining-Turtles)
+
 ## Commands
 
 MCTurtles understand many commands but require a player to direct them.
