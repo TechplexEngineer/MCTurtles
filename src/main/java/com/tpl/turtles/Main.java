@@ -42,25 +42,25 @@ public class Main extends JavaPlugin {
 		getCommand("turtle").setExecutor(new TurtleCMD());
 		getCommand("reloadscripts").setExecutor(new ReloadCMD());
 
-		YamlConfiguration c = new YamlConfiguration();
-		try {
-			File f = new File(getDataFolder() + File.separator + "turtles.yml");
-			if (!f.exists())
-				f.createNewFile();
-			c.load(f);
-		} catch (IOException | InvalidConfigurationException e) {
-			e.printStackTrace();
-		}
-		for (String s : c.getKeys(false)) {
-			@SuppressWarnings("deprecation")
-			Turtle t = TurtleMgr.getNewTurtle(s,
-					Material.getMaterial(c.getInt(s + ".material")),
-					new Location(Bukkit.getWorld(c.getString(s + ".location.world")), c.getInt(s + ".location.x"), c.getInt(s + ".location.y"), c.getInt(s + ".location.z")),
-					c.getString(s + ".owner"));
-			@SuppressWarnings("unchecked")
-			ItemStack[] content = ((List<ItemStack>) c.get(s + ".inv")).toArray(new ItemStack[0]);
-			t.getInventory().setContents(content);
-		}
+//		YamlConfiguration c = new YamlConfiguration();
+//		try {
+//			File f = new File(getDataFolder() + File.separator + "turtles.yml");
+//			if (!f.exists())
+//				f.createNewFile();
+//			c.load(f);
+//		} catch (IOException | InvalidConfigurationException e) {
+//			e.printStackTrace();
+//		}
+//		for (String s : c.getKeys(false)) {
+//			@SuppressWarnings("deprecation")
+//			Turtle t = TurtleMgr.getNewTurtle(s,
+//					Material.getMaterial(c.getInt(s + ".material")),
+//					new Location(Bukkit.getWorld(c.getString(s + ".location.world")), c.getInt(s + ".location.x"), c.getInt(s + ".location.y"), c.getInt(s + ".location.z")),
+//					c.getString(s + ".owner"));
+//			@SuppressWarnings("unchecked")
+//			ItemStack[] content = ((List<ItemStack>) c.get(s + ".inv")).toArray(new ItemStack[0]);
+//			t.getInventory().setContents(content);
+//		}
 	}
 
 	@Override
@@ -85,21 +85,7 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		YamlConfiguration c = new YamlConfiguration();
-		for (Turtle t : TurtleMgr.getTurtles()) {
-//			if (t.isRunning()) {
-//				t.stop();
-//				if (t.getOwner() != null)
-//					t.getOwner().sendMessage(ChatColor.RED + "Server reloading, stopping turtle.");
-//			}
-			String path = t.getName();
-			c.set(path + ".owner", t.getOwnerName());
-			c.set(path + ".location.x", t.getLocation().getBlockX());
-			c.set(path + ".location.y", t.getLocation().getBlockY());
-			c.set(path + ".location.z", t.getLocation().getBlockZ());
-			c.set(path + ".location.world", t.getLocation().getWorld().getName());
-			c.set(path + ".material", t.getMaterial().getId());
-			c.set(path + ".inv", t.getInventory().getContents());
-		}
+		c.set("Turtles", TurtleMgr.getInstance());
 		try {
 			c.save(new File(getDataFolder() + File.separator + "turtles.yml"));
 		} catch (IOException e) {

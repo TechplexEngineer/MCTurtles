@@ -23,7 +23,7 @@ public class PlayerListener implements Listener {
 	public void onBreak(BlockBreakEvent event) {
 		if (event.getBlock().getType() != Main.TURTLE_MATERIAL)
 			return;
-		Turtle t = TurtleMgr.getByLoc(event.getBlock().getLocation());
+		Turtle t = TurtleMgr.getInstance().getByLoc(event.getBlock().getLocation());
 		if (t == null)
 			return;
 		if (!event.getPlayer().getName().equalsIgnoreCase(t.getOwner().getName()) && !event.getPlayer().isOp()) {
@@ -46,7 +46,7 @@ public class PlayerListener implements Listener {
 		}
 		Player p = event.getPlayer();
 		Block blk = event.getClickedBlock();
-		Turtle t = TurtleMgr.getByLoc(blk.getLocation());
+		Turtle t = TurtleMgr.getInstance().getByLoc(blk.getLocation());
 		if (t == null) {
 			Player player = event.getPlayer();
 			if (player.getItemInHand().getType() == Main.TURTLEWAND_MATERIAL) {
@@ -80,9 +80,9 @@ public class PlayerListener implements Listener {
 					return;
 				}
 				System.out.println("Creating new turtle named:"+name);
-				Turtle t = TurtleMgr.getByName(name);
+				Turtle t = TurtleMgr.getInstance().getByName(name);
 				if (t == null) {
-					t = TurtleMgr.getNewTurtle(name, Main.TURTLE_MATERIAL, l, player.getName());
+					t = TurtleMgr.getInstance().getNewTurtle(name, Main.TURTLE_MATERIAL, l, player.getName());
 					player.sendMessage(ChatColor.GREEN + "Created turtle: " + t.getName());
 				} else {
 					player.sendMessage(ChatColor.RED + "A turtle with that name already exists.");

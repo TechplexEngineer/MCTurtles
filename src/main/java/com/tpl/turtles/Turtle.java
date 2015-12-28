@@ -11,13 +11,13 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Directional;
-import org.bukkit.util.Vector;
 
-public class Turtle {
+public class Turtle implements ConfigurationSerializable {
 
 	//==========================================================================
     // Properties
@@ -49,6 +49,67 @@ public class Turtle {
 		inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
 		bookmarks = new HashMap<>();
 	}
+	/**
+	 * This constructor is used exclusively for serialization
+	 * @param name
+	 * @param loc
+	 * @param mat
+	 * @param inv
+	 * @param owner
+	 * @param mined
+	 * @param placed
+	 * @param obeyCreative
+	 * @param penDown
+	 * @param bookmarks 
+	 */
+	private Turtle(String name, Location loc, Material mat, Inventory inv, String owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks) {
+		this.name = name.replace(' ','_');
+		this.loc = loc;
+		this.mat = mat;
+		this.inv = inv;
+		this.owner = owner;
+		this.mined = mined;
+		this.placed = placed;
+		this.obeyCreative = obeyCreative;
+		this.penDown = penDown;
+		this.bookmarks = bookmarks;
+	}
+	
+	
+	@Override
+	public Map<String, Object> serialize() {
+		Map<String, Object> map = new HashMap<>();
+		//name
+		map.put("loc", getLocation());
+		map.put("material", getMaterial());
+		map.put("inv", getInventory());
+		map.put("owner", getOwnerName());
+		map.put("mined", getMined());
+		map.put("placed", getPlaced());
+		map.put("obeyCreative", obeyCreative);
+		map.put("penDown", penDown);
+		map.put("bookmarks", bookmarks);
+		
+		return map;
+		
+	}
+	
+	public static Turtle deserialize(Map<String, Object> map, String name) {
+		
+//		String name;
+		Location loc = (Location)map.get("loc"); //the current turtle location
+		final Material mat = (Material)map.get("material");
+		//Script script
+		final Inventory inv = (Inventory)map.get("inv");
+		String owner = (String)map.get("owner");
+		int mined = (int)map.get("mined");
+		int placed = (int)map.get("placed");
+		boolean obeyCreative = (boolean)map.get("obeyCreative");
+		Material penDown = (Material)map.get("penDown");
+		Map<String, Location> bookmarks = (HashMap<String, Location>)map.get("bookmarks");
+		
+		return new Turtle(name, loc, mat, inv, owner, mined, placed, obeyCreative, penDown, bookmarks);
+	}
 	
 	/**
 	 * Should be called when removing turtle from world
@@ -62,7 +123,7 @@ public class Turtle {
 		inv.clear();
 		loc.getBlock().breakNaturally();
 		if (!KDebug.isCalledFrom("TurtleMgr")) {
-			TurtleMgr.remove(this.getName());
+			TurtleMgr.getInstance().remove(this.getName());
 		}
 		
 	}
@@ -254,6 +315,7 @@ public class Turtle {
 		bookmarks.put(name, loc);
 		return true;
 	}
+
 	
 	//==========================================================================
     // Utils

@@ -50,8 +50,8 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		Player p = (Player) sender;
 		
 		if (args[0].equalsIgnoreCase("list")) {
-			sender.sendMessage("There are "+TurtleMgr.getTurtles().size()+" turtles:");
-			for (Turtle tur : TurtleMgr.getTurtles()) {
+			sender.sendMessage("There are "+TurtleMgr.getInstance().getTurtles().size()+" turtles:");
+			for (Turtle tur : TurtleMgr.getInstance().getTurtles()) {
 				sender.sendMessage(tur.getName());
 			}
 			return true;
@@ -63,7 +63,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		}
 		
 		String name = args[0];
-		Turtle t = TurtleMgr.getByName(name);
+		Turtle t = TurtleMgr.getInstance().getByName(name);
 		if (t == null) {
 			sender.sendMessage(ChatColor.RED + "Turtle " + name + " does not exist.");
 			return true;
@@ -280,7 +280,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		
-		Turtle turtle = TurtleMgr.getByName(args[0]);
+		Turtle turtle = TurtleMgr.getInstance().getByName(args[0]);
 		
 		//turtle name and "list" tab complete
 		if (args.length == 1) {
@@ -288,7 +288,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 
 			if ("list".toLowerCase().startsWith(args[0].toLowerCase()))
 				possibles.add("list");
-			for (Turtle t : TurtleMgr.getTurtles()) {
+			for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
 				if (sender != t.getOwner())
 					continue;
 				String name = t.getName();
