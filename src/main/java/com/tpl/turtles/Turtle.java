@@ -27,6 +27,7 @@ public class Turtle {
 	private String owner;
 	private int mined = 0, placed = 0;
 	private boolean obeyCreative = true;
+	private Material penDown = Material.AIR;
 
 	//==========================================================================
     // Constructors & Destructors
@@ -131,6 +132,21 @@ public class Turtle {
 			return null;
 		}
 	}
+	/**
+	 * When the turtle's pen is down it places the penDown material when it moves
+	 * @return true if turtle's pen is down, false otherwise
+	 */
+	public boolean isPenDown() {
+		return penDown != Material.AIR;
+	}
+	
+	/**
+	 * When the turtle's pen is up it does not place a material when it moves
+	 * @return true if turtle's pen is up, false otherwise
+	 */
+	public boolean isPenUp() {
+		return penDown == Material.AIR;
+	}
 	
 	//==========================================================================
     // Setters
@@ -165,9 +181,52 @@ public class Turtle {
 	 * @param slot the slot number to check
 	 * @return item type, else return Material.AIR
 	 */
-	private Material getType(int slot) {
+	public Material getType(int slot) {
 		ItemStack is = getInventory().getItem(slot);
 		return is == null ? Material.AIR : is.getType();
+	}
+	
+	/**
+	 * When the turtle's pen is down it places the penDown material when it moves
+	 * @param m material to leave behind
+	 */
+	public void setPenDown(Material m) {
+		penDown = m;
+	}
+	
+	/**
+	 * Make the turtle stop placing blocks when it moves
+	 */
+	public void setPenUp() {
+		penDown = Material.AIR;
+	}
+	
+	/**
+	 * Get the number of blocks mined:
+	 * - Since last reset
+	 * - Since the turtle was created
+	 * @return number of blocks mined
+	 */
+	public int getMined() {
+		return mined;
+	}
+	
+	/**
+	 * Get the number of blocks placed:
+	 * - Since the last reset
+	 * - Since the turtle was created
+	 * @return 
+	 */
+	public int getPlaced() {
+		return placed;
+	}
+	
+	/**
+	 * Set the mined and placed stats to 0;
+	 */
+	public void resetStats() {
+		mined = 0;
+		placed = 0;
 	}
 	
 	//==========================================================================
@@ -243,6 +302,7 @@ public class Turtle {
 		for (ItemStack is : b.getDrops())
 			getInventory().addItem(is);
 		b.setType(Material.AIR);
+		mined ++;
 		return true;
 	}
 	
@@ -319,7 +379,10 @@ public class Turtle {
 	 * @return success
 	 */
 	public boolean setLocation(Location newloc, BlockFace facing) {
-		this.loc.getBlock().setType(Material.AIR);
+		this.loc.getBlock().setType(penDown);
+		if (penDown != Material.AIR) {
+			placed ++;
+		}
 		this.loc = newloc;
 		Block b = loc.getBlock();
 		b.setType(mat);
