@@ -12,72 +12,72 @@ Players can get an instruction manual in-game by typing "/t book" to get the boo
 
 ### Note
 
-A parameter in angle brackets <dir> is required.
+A parameter in angle brackets \<dir> is required.
 
 A parameter in square brackets [num] is optional.
 
 More info:
 techplex.io/mcturtles
 
-## Move <dir> [num]§r
+## Move \<dir> [num]
 
-Move the turtle in <dir> direction [num] blocks.
+Move the turtle in \<dir> direction [num] blocks.
 
-Where <dir> is one of:
+Where \<dir> is one of:
        NORTH SOUTH EAST
    WEST LEFT RIGHT UP
    DOWN FORWARD BACK
 
 And [num] is optional, when not provided 1 is used.
 
-## Rotate <dir>
+## Rotate \<dir>
 
-Rotate the turtle 90° in <dir> direction.
+Rotate the turtle 90° in \<dir> direction.
 
-Where <dir> is one of:
+Where \<dir> is one of:
    NORTH SOUTH EAST
    WEST LEFT RIGHT UP
    DOWN FORWARD BACK
 
-## Mine <dir>
+## Mine \<dir>
 
-Mine 1 block in <dir> direction.
+Mine 1 block in \<dir> direction.
 
-Where <dir> is one of:
+Where \<dir> is one of:
    NORTH SOUTH EAST
    WEST LEFT RIGHT UP
    DOWN FORWARD BACK
 
-## Place <dir> <mat>
+## Place \<dir> \<mat>
 
-Place block of type <mat> in <dir> direction.
+Place block of type \<mat> in \<dir> direction.
 
-Where <mat> is a valid material. Page x lists some common materials.
+Where \<mat> is a valid material. Page x lists some common materials.
 
-And <dir> is one of:
+And \<dir> is one of:
    NORTH SOUTH EAST
    WEST LEFT RIGHT UP
    DOWN FORWARD BACK
 
   @note obey creative...
 
-## PenDown <mat>
+## PenDown \<mat>
 
-Place a block each time the turtle moves leaving a trail of <mat> blocks behind.
+Place a block each time the turtle moves leaving a trail of \<mat> blocks behind.
 
-Where <mat> is a valid material. Page x lists some common materials.
+Where \<mat> is a valid material. Page x lists some common materials.
 
 ## PenUp
 
 Stop leaving a trail of blocks.
 
-## Bookmark <name>
+## Bookmark \<name>
 
-Save the current location with the name <name>.
+Save the current location with the name \<name>.
 
-## GoBookmark <name>
+## GoBookmark \<name>
 
-Move the turtle to the saved bookmark named <name>.
+Move the turtle to the saved bookmark named \<name>.
 
 ## Common Materials 
 
