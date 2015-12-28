@@ -37,11 +37,11 @@ public class Turtle {
 		if (!KDebug.isCalledFrom("TurtleMgr")) {
 			System.err.println("Invalid Invocation. Turtles can only be created from the TurtleMgr");
 		}
-		this.name = name;
+		this.name = name.replace(' ','_'); // @note names cannot contain spaces
 		this.loc = loc;
 		this.mat = mat;
 		this.owner = owner;
-		inv = Bukkit.createInventory(null, 9 * 4,  name + " the turtle");
+		inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
 	}
 	
 	/**
