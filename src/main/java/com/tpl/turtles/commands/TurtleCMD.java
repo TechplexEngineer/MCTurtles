@@ -25,7 +25,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 	private static final String[] DIR_STRINGS = {"NORTH", "SOUTH", "EAST", "WEST", "UP", "DOWN", "RIGHT", "LEFT", "FORWARD", "BACK"};
 	private static final String DIR_STRING = StringUtils.join(DIR_STRINGS, "|");
 	
-	private static final String[] CMDS_STRINGS = {"delete","move", "rotate", "mine", "place"};
+	private static final String[] CMDS_STRINGS = {"delete","move", "rotate", "mine", "place", "bookmark", "goBookmark"};
 	private static final String CMD_STRING = StringUtils.join(CMDS_STRINGS,"|");
 	
 	private static final List<String> mats = new ArrayList<>();
@@ -179,6 +179,26 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			return true;
 		}
 		
+		if(act.equalsIgnoreCase("bookmark")) {
+			if (args.length == 3) {
+				t.bookmark(dir);
+				return true;
+			} else {
+				sender.sendMessage("/t <turtle> bookmark <bookmark_name>");
+				return false;
+			}
+		}
+		
+		if(act.equalsIgnoreCase("goBookmark")) {
+			if (args.length == 3) {
+				t.goBookmark(dir);
+				return true;
+			} else {
+				sender.sendMessage("/t <turtle> goBookmark <bookmark_name>");
+				return false;
+			}
+		}
+		
 		//else send them the usage message
 		sender.sendMessage("/t <turtle> "+CMD_STRING+" ...");
 		
@@ -259,6 +279,10 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		
+		Turtle turtle = TurtleMgr.getByName(args[0]);
+		
+		//turtle name and "list" tab complete
 		if (args.length == 1) {
 			List<String> possibles = new ArrayList<>();
 
@@ -279,6 +303,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			return possibles;
 		}
 		if (!args[0].toLowerCase().equalsIgnoreCase("list")) {
+			// command tab complete
 			if (args.length == 2) {
 				List<String> pos = new ArrayList<>();
 				for (String s : CMDS_STRINGS) {
@@ -288,21 +313,30 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 				}
 				return pos;
 			}
-			if (args.length == 3) {
-				System.out.println("three");
+			
+			// direction tab complete
+			if (args.length == 3 && ("move|rotate|mine|place".contains(args[1].toLowerCase())) ) {
 				List<String> pos = new ArrayList<>();
 				for (String s : DIR_STRINGS)
 					if (s.toLowerCase().startsWith(args[2].toLowerCase()))
 						pos.add(s);
 				return pos;
 			}
-			if (args.length == 4 && args[1].equalsIgnoreCase("place")) {
-
+			// bookmark tab complete
+			if (args.length == 3 && ("bookmark|gobookmark".contains(args[1].toLowerCase())) ) {
+				System.out.println("three");
+				List<String> pos = new ArrayList<>();
+				for (String s : turtle.getBookmarks().keySet())
+					if (s.toLowerCase().startsWith(args[2].toLowerCase()))
+						pos.add(s);
+				return pos;
+			}
+			// material tab complete
+			if (args.length == 4 && ("place".contains(args[1].toLowerCase())) ) {
 				List<String> pos = new ArrayList<>();
 				for (String s : mats)
 					if (s.toLowerCase().startsWith(args[3].toLowerCase()))
 						pos.add(s);
-				System.out.println("four "+mats.size()+" "+pos.size()+" "+args[3]);
 				return pos;
 			}
 		}

@@ -2,6 +2,8 @@ package com.tpl.turtles;
 
 
 import com.tpl.turtles.utils.KDebug;
+import java.util.HashMap;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -13,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Directional;
+import org.bukkit.util.Vector;
 
 public class Turtle {
 
@@ -20,14 +23,15 @@ public class Turtle {
     // Properties
     //==========================================================================
 	private String name;
-	private Location loc;
+	private Location loc; //the current turtle location
 	private final Material mat;
-//	private Script script;
+//	private Script script
 	private final Inventory inv;
 	private String owner;
 	private int mined = 0, placed = 0;
 	private boolean obeyCreative = true;
 	private Material penDown = Material.AIR;
+	private Map<String, Location> bookmarks;
 
 	//==========================================================================
     // Constructors & Destructors
@@ -43,6 +47,7 @@ public class Turtle {
 		this.mat = mat;
 		this.owner = owner;
 		inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
+		bookmarks = new HashMap<>();
 	}
 	
 	/**
@@ -148,6 +153,14 @@ public class Turtle {
 		return penDown == Material.AIR;
 	}
 	
+	/**
+	 * Get a map of all bookmarks
+	 * @return map of bookmarks
+	 */
+	public Map<String, Location> getBookmarks() {
+		return bookmarks;
+	}
+	
 	//==========================================================================
     // Setters
     //==========================================================================
@@ -227,6 +240,19 @@ public class Turtle {
 	public void resetStats() {
 		mined = 0;
 		placed = 0;
+	}
+	
+	/**
+	 * Create a bookmark at the current turtle location for easy access
+	 * @param name name of the bookmark
+	 * @return 
+	 */
+	public boolean bookmark(String name) {
+		if (bookmarks.containsKey(name)) {
+			return false;
+		}
+		bookmarks.put(name, loc);
+		return true;
 	}
 	
 	//==========================================================================
@@ -461,8 +487,24 @@ public class Turtle {
 	 * @param mat the material to look for
 	 * @return true if the block in face direction is the same material as mat
 	 */
-	private boolean checkType(BlockFace face, Material mat) {
+	public boolean checkType(BlockFace face, Material mat) {
 		return this.loc.getBlock().getRelative(face).getType() == mat;
+	}
+	
+	/**
+	 * Move the turtle to the bookmark name
+	 * WARNING! This does not check if the bookmark location is empty
+	 * @param name the bookmark to go to
+	 * @return true if bookmark exists, false otherwise
+	 */
+	public boolean goBookmark(String name) {
+		
+		if (bookmarks.containsKey(name)) {
+			setLocation(bookmarks.get(name), getDir());
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 
