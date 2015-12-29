@@ -3,6 +3,7 @@ package com.tpl.turtles;
 
 import com.tpl.turtles.utils.KDebug;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -31,7 +32,7 @@ public class Turtle implements ConfigurationSerializable {
 	private int mined = 0, placed = 0;
 	private boolean obeyCreative = true;
 	private Material penDown = Material.AIR;
-	private Map<String, Location> bookmarks;
+	private final Map<String, Location> bookmarks;
 
 	//==========================================================================
     // Constructors & Destructors
@@ -40,7 +41,7 @@ public class Turtle implements ConfigurationSerializable {
 	public Turtle(String name, Material mat, Location loc, String owner) {
 		
 		if (!KDebug.isCalledFrom("TurtleMgr")) {
-			System.err.println("Invalid Invocation. Turtles can only be created from the TurtleMgr");
+			System.err.println("Invalid Invocation. Turtles SHOULD only be created from the TurtleMgr");
 		}
 		this.name = name.replace(' ','_'); // @note names cannot contain spaces
 		this.loc = loc;
@@ -62,50 +63,55 @@ public class Turtle implements ConfigurationSerializable {
 	 * @param penDown
 	 * @param bookmarks 
 	 */
-	private Turtle(String name, Location loc, Material mat, Inventory inv, String owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks) {
+	private Turtle(String name, Location loc, Material mat, ItemStack[] inv, String owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks) {
 		this.name = name.replace(' ','_');
 		this.loc = loc;
 		this.mat = mat;
-		this.inv = inv;
+		this.inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
+		this.inv.setContents(inv);
 		this.owner = owner;
 		this.mined = mined;
 		this.placed = placed;
 		this.obeyCreative = obeyCreative;
 		this.penDown = penDown;
 		this.bookmarks = bookmarks;
+
+		
+
 	}
 	
 	
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();
-		//name
+		map.put("name", getName());
 		map.put("loc", getLocation());
-		map.put("material", getMaterial());
-		map.put("inv", getInventory());
+		map.put("material", getMaterial().name());
+		map.put("inv", getInventory().getContents());
 		map.put("owner", getOwnerName());
 		map.put("mined", getMined());
 		map.put("placed", getPlaced());
 		map.put("obeyCreative", obeyCreative);
-		map.put("penDown", penDown);
+		map.put("penDown", penDown.name());
 		map.put("bookmarks", bookmarks);
 		
 		return map;
 		
 	}
 	
-	public static Turtle deserialize(Map<String, Object> map, String name) {
+	public static Turtle deserialize(Map<String, Object> map) {
 		
-//		String name;
+		String name = (String)map.get("name");
 		Location loc = (Location)map.get("loc"); //the current turtle location
-		final Material mat = (Material)map.get("material");
+		final Material mat = Material.matchMaterial((String)map.get("material"));
 		//Script script
-		final Inventory inv = (Inventory)map.get("inv");
+		
+		ItemStack[] inv = ((List<ItemStack>) map.get("inv")).toArray(new ItemStack[0]);
 		String owner = (String)map.get("owner");
 		int mined = (int)map.get("mined");
 		int placed = (int)map.get("placed");
 		boolean obeyCreative = (boolean)map.get("obeyCreative");
-		Material penDown = (Material)map.get("penDown");
+		Material penDown = Material.matchMaterial((String)map.get("penDown"));
 		Map<String, Location> bookmarks = (HashMap<String, Location>)map.get("bookmarks");
 		
 		return new Turtle(name, loc, mat, inv, owner, mined, placed, obeyCreative, penDown, bookmarks);

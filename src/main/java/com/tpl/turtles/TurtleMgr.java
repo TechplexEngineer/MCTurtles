@@ -7,22 +7,19 @@ package com.tpl.turtles;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 
 /**
  * Manage a list of turtles
  * @author techplex
  */
-public class TurtleMgr implements ConfigurationSerializable {
+public class TurtleMgr  {
 	
 	private static TurtleMgr inst = null;
-	protected TurtleMgr () {
+	private TurtleMgr () {
 		
 	}
 	public static TurtleMgr getInstance() {
@@ -39,35 +36,6 @@ public class TurtleMgr implements ConfigurationSerializable {
 		add(t);
 		return t;
 	}
-	
-	/**
-     * Creates a Map representation of this class.
-     * @return Map containing the current state of this class
-     */
-	@Override
-	public Map<String, Object> serialize() {
-		Map<String, Object> m = new HashMap<>();
-		for (Turtle t : TURTLES) {
-			m.put(t.getName(), t);
-		}
-		return m;
-	}
-	
-	/**
-	 * Deserialize a TurtleMgr by adding all turtles to the TurtleMgr singleton
-	 * @param map
-	 * @return 
-	 */
-	public TurtleMgr deserialize(Map<String, Object> map) {
-		TurtleMgr tm = TurtleMgr.getInstance();
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
-			Turtle t = (Turtle)entry;
-			tm.add(t);
-		}
-		return tm;
-	}
-	
-	
 	
 	/**
 	 * Get a list of turtles
@@ -89,6 +57,18 @@ public class TurtleMgr implements ConfigurationSerializable {
 		}
 		return false;
 		
+	}
+	
+	/**
+	 * Add each turtle to the TurtleMgr
+	 * @todo I really would like to have the serialization in turtleMgr but
+	 * the yaml serializer kept throwing errors.
+	 * @param turtles list of turtles to add
+	 */
+	public void addEach(List<Turtle> turtles) {
+		for(Turtle t : turtles) {
+			add(t);
+		}
 	}
 	
 	/**

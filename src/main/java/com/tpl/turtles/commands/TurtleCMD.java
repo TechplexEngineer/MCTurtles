@@ -1,6 +1,7 @@
 package com.tpl.turtles.commands;
 
 import com.tpl.turtles.DocBook;
+import com.tpl.turtles.Main;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class TurtleCMD implements CommandExecutor, TabCompleter {
 	
@@ -40,14 +42,14 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
      * Executes the given command, returning its success
      *
      * @param sender Source of the command
-     * @param command Command which was executed
+     * @param cmd Command which was executed
      * @param label Alias of the command which was used
      * @param args Passed command arguments
      * @return true if a valid command, otherwise false
      */
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		Player p = (Player) sender;
+		
 		
 		if (args[0].equalsIgnoreCase("list")) {
 			sender.sendMessage("There are "+TurtleMgr.getInstance().getTurtles().size()+" turtles:");
@@ -57,8 +59,49 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			return true;
 		}
 		
+		Player p = null;
+		if (sender instanceof Player) {
+			p = (Player) sender;
+		}
+		
 		if (args[0].equalsIgnoreCase("book")) {
+			
 			Book.give2player(p, DocBook.getDocBook());
+			return true;
+		}
+		
+		if (args[0].equalsIgnoreCase("wand")) {
+			if (!(sender instanceof Player)) {
+				sender.sendMessage(ChatColor.RED + "You must be a player!");
+				return false;
+			}
+
+			ItemStack rod = new ItemStack(Main.TURTLEWAND_MATERIAL);
+			ItemMeta im = rod.getItemMeta();
+			im.setDisplayName("Create a Turtle");
+			rod.setItemMeta(im);
+			p.getInventory().addItem(rod);
+			p.getInventory().addItem(new ItemStack(Main.TURTLE_MATERIAL));
+			sender.sendMessage(ChatColor.GREEN + "Click with this wand on a " + Main.TURTLE_MATERIAL.toString() + " to create a turtle.");
+
+			return true;
+		}
+		
+		if (args[0].equalsIgnoreCase("persist")) {
+			Main.inst.persistTurtles();
+			sender.sendMessage("Persisting turtles");
+			return true;
+		}
+		
+		if (args[0].equalsIgnoreCase("restore")) {
+			int num = Main.inst.restoreTurtles();
+			sender.sendMessage("Restored "+num+" turtles");
+			return true;
+		}
+		
+		if (args[0].equalsIgnoreCase("reload")) {
+			Main.inst.persistTurtles();
+			Main.inst.restoreTurtles();
 			return true;
 		}
 		
@@ -66,12 +109,12 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		Turtle t = TurtleMgr.getInstance().getByName(name);
 		if (t == null) {
 			sender.sendMessage(ChatColor.RED + "Turtle " + name + " does not exist.");
-			return true;
+			return false;
 		}
 		Player owner = t.getOwner();
 		if (owner != sender) {
 			sender.sendMessage(ChatColor.RED + "You don't own that turtle.");
-			return true;
+			return false;
 		}
 		
 		String act = "";
@@ -134,6 +177,10 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		}
 		
 		if(act.equalsIgnoreCase("book")) {
+			if (!(sender instanceof Player)) {
+				sender.sendMessage(ChatColor.RED + "You must be a player!");
+				return false;
+			}
 			
 			ItemStack book;
 			if (p != t.getOwner()) {
@@ -286,8 +333,12 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		if (args.length == 1) {
 			List<String> possibles = new ArrayList<>();
 
-			if ("list".toLowerCase().startsWith(args[0].toLowerCase()))
+			if ("list".startsWith(args[0].toLowerCase())) {
 				possibles.add("list");
+			}
+			if ("wand".startsWith(args[0].toLowerCase())) {
+				possibles.add("wand");
+			}
 			for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
 				if (sender != t.getOwner())
 					continue;
@@ -302,7 +353,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			
 			return possibles;
 		}
-		if (!args[0].toLowerCase().equalsIgnoreCase("list")) {
+		if (! ("list|wand".contains(args[0].toLowerCase())) ) {
 			// command tab complete
 			if (args.length == 2) {
 				List<String> pos = new ArrayList<>();

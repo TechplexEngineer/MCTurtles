@@ -18,6 +18,6 @@ public class ReloadCMD implements CommandExecutor {
 		Main.inst.reloadConfig();
 		Main.inst.config = Main.inst.getConfig();
 		sender.sendMessage(ChatColor.GREEN + "Reloaded the scripts!");
-		return false;
+		return true;
 	}
 }

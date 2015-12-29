@@ -35,7 +35,11 @@ public class PlayerListener implements Listener {
 			t.destroy();
 		}
 	}
-
+	
+	/**
+	 * Handle the creation of turtles and opening their inventory
+	 * @param event 
+	 */
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onOpeninv(PlayerInteractEvent event) {
 		if (event.getPlayer().isSneaking() 

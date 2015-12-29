@@ -1,8 +1,8 @@
-name: Turtles
+name: MCTurtles
 author: TechplexEngineer
 main: com.tpl.turtles.Main
 version: 1.3
-prefix: Turltes
+prefix: MCTurtles
 commands:
   turtle:
     aliases: [t]
