@@ -27,7 +27,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 	private static final String[] DIR_STRINGS = {"NORTH", "SOUTH", "EAST", "WEST", "UP", "DOWN", "RIGHT", "LEFT", "FORWARD", "BACK"};
 	private static final String DIR_STRING = StringUtils.join(DIR_STRINGS, "|");
 	
-	private static final String[] CMDS_STRINGS = {"delete","move", "rotate", "mine", "place", "bookmark", "goBookmark"};
+	private static final String[] CMDS_STRINGS = {"delete","move", "rotate", "mine", "place", "bookmark", "goBookmark", "firework"};
 	private static final String CMD_STRING = StringUtils.join(CMDS_STRINGS,"|");
 	
 	private static final List<String> mats = new ArrayList<>();
@@ -134,6 +134,11 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		
 		if(act.equalsIgnoreCase("delete")) {
 			t.destroy();
+
+			return true;
+		}
+		if(act.equalsIgnoreCase("fw") || act.equalsIgnoreCase("firework")) {
+			t.makeFirework();
 
 			return true;
 		}

@@ -5,7 +5,10 @@ import com.tpl.turtles.utils.KDebug;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,9 +16,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.material.Directional;
 
 public class Turtle implements ConfigurationSerializable {
@@ -574,6 +580,86 @@ public class Turtle implements ConfigurationSerializable {
 			return false;
 		}
 	}
+	
+	/*
+		create a firework at the given location
+	  */
+//	  function bukkitFirework( location ) {
+//		var Color = org.bukkit.Color;
+//		var bkFireworkEffect = org.bukkit.FireworkEffect;
+//		var bkEntityType = org.bukkit.entity.EntityType;
+
+	/**
+	 * Get a random number between min and max, inclusive of both min and max
+	 * @param min smallest value, inclusive
+	 * @param max largest value, inclusive
+	 * @return random number
+	 */
+	private int randInt (int min, int max ) {
+		return ThreadLocalRandom.current().nextInt(min, max + 1);
+	}
+	/**
+	 * Get one of the colors by idx
+	 * @param idx
+	 * @return Color
+	 */
+	
+	private Color getColor(int idx) {
+		Color[] colors = {Color.AQUA, Color.BLACK, Color.BLUE, Color.FUCHSIA, 
+			Color.GRAY,	Color.GREEN, Color.LIME, Color.MAROON, Color.NAVY, 
+			Color.OLIVE, Color.ORANGE, Color.PURPLE, Color.RED, Color.SILVER, 
+			Color.TEAL, Color.WHITE, Color.YELLOW};
+		if(idx <= colors.length-1) {
+			return colors[idx];
+		} else {
+			return colors[0];
+		}
+	}
+	
+	/**
+	 * Get one of the firework types by idx
+	 * @param idx
+	 * @return Firework Type
+	 */
+	private FireworkEffect.Type getFWType(int idx) {
+		FireworkEffect.Type[] types = {FireworkEffect.Type.BALL, 
+			FireworkEffect.Type.BALL_LARGE, FireworkEffect.Type.BURST, 
+			FireworkEffect.Type.CREEPER, FireworkEffect.Type.STAR};
+		if(idx <= types.length-1) {
+			return types[idx];
+		} else {
+			return types[0];
+		}
+	}
+	
+	/**
+	 * Make a firework at the turtle's current location
+	 * Great for identifying where the turtle is when you loose him.
+	 */
+    public void makeFirework() {              
+
+		//Spawn the Firework, get the FireworkMeta.
+		Firework fw = (Firework) loc.getWorld().spawnEntity(getLocation(), EntityType.FIREWORK);
+		FireworkMeta fwm = fw.getFireworkMeta();
+
+		//Create our effect with this
+		FireworkEffect effect = FireworkEffect.builder()
+				.flicker(ThreadLocalRandom.current().nextBoolean())
+				.withColor(getColor(randInt(0, 16)))
+				.withFade(getColor(randInt(0, 16)))
+				.with(getFWType(randInt(0, 5)))
+				.trail(ThreadLocalRandom.current().nextBoolean())
+				.build();
+
+		//Then apply the effect to the meta
+		fwm.addEffect(effect);
+
+		//Generate some random power and set it
+		fwm.setPower(randInt(1, 2));
+
+		//Then apply this to our rocket
+		fw.setFireworkMeta(fwm);                  
+    }
 	
 
 //	public void setScript(Script script) {
