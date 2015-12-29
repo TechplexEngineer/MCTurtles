@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.tpl.turtles.commands.ReloadCMD;
 import com.tpl.turtles.commands.TurtleCMD;
+import com.tpl.turtles.web.WebServer;
 import java.util.List;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
@@ -37,11 +38,14 @@ public class Main extends JavaPlugin {
 		getCommand("reloadscripts").setExecutor(new ReloadCMD());
 
 		restoreTurtles();
+		
+		WebServer.getInstance().start();
 	}
 
 	@Override
 	public void onDisable() {
 		persistTurtles();
+		WebServer.getInstance().stop();
 	}
 	
 	public void persistTurtles() {
