@@ -11,6 +11,7 @@
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
+			<!-- Protocol Lib-->
 			<id>dmulloy2-repo</id>
 			<url>http://repo.dmulloy2.net/content/repositories/snapshots/</url>
 		</repository>
@@ -22,12 +23,6 @@
 			<artifactId>spigot-api</artifactId>
 			<version>1.8.8-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
-		 <exclusions>
-		  <exclusion>
-		   <groupId>com.google.code.gson</groupId>
-		   <artifactId>gson</artifactId>
-		  </exclusion>
-		 </exclusions>
 		</dependency>
 		<!--Bukkit API-->
 		<dependency>
@@ -35,12 +30,6 @@
 			<artifactId>bukkit</artifactId>
 			<version>1.8.8-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
-		 <exclusions>
-		  <exclusion>
-		   <groupId>com.google.code.gson</groupId>
-		   <artifactId>gson</artifactId>
-		  </exclusion>
-		 </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.comphenix.protocol</groupId>
