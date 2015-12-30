@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -23,6 +25,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.material.Directional;
+import org.bukkit.material.MaterialData;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 public class Turtle implements ConfigurationSerializable {
 
@@ -31,7 +36,6 @@ public class Turtle implements ConfigurationSerializable {
     //==========================================================================
 	private String name;
 	private Location loc; //the current turtle location
-	private final Material mat;
 //	private Script script
 	private final Inventory inv;
 	private String owner;
@@ -39,19 +43,26 @@ public class Turtle implements ConfigurationSerializable {
 	private boolean obeyCreative = true;
 	private Material penDown = Material.AIR;
 	private final Map<String, Location> bookmarks;
+	private BlockFace pointing;
+	private BlinkTask blinkTask = null;
+	
+	public static final Material TURTLE_BLINK_MATERIAL = Material.GLOWSTONE;
+	public static final Material TURTLE_MATERIAL = Material.DISPENSER; //@note use a directioal block
+	public static final Material TURTLEWAND_MATERIAL = Material.BLAZE_ROD;
+	
+	//@note continued (directional blocks): Banner, Bed, Button, Chest, CocoaPlant, Diode, DirectionalContainer, Dispenser, Door, EnderChest, Furnace, FurnaceAndDispenser, Gate, Ladder, Lever, PistonBaseMaterial, PistonExtensionMaterial, Pumpkin, RedstoneTorch, Sign, SimpleAttachableMaterialData, Skull, Stairs, Torch, TrapDoor, TripwireHook
 
 	//==========================================================================
     // Constructors & Destructors
     //==========================================================================
 
-	public Turtle(String name, Material mat, Location loc, String owner) {
+	public Turtle(String name, Location loc, String owner) {
 		
 		if (!KDebug.isCalledFrom("TurtleMgr")) {
 			System.err.println("Invalid Invocation. Turtles SHOULD only be created from the TurtleMgr");
 		}
 		this.name = name.replace(' ','_'); // @note names cannot contain spaces
 		this.loc = loc;
-		this.mat = mat;
 		this.owner = owner;
 		inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
 		bookmarks = new HashMap<>();
@@ -60,7 +71,6 @@ public class Turtle implements ConfigurationSerializable {
 	 * This constructor is used exclusively for serialization
 	 * @param name
 	 * @param loc
-	 * @param mat
 	 * @param inv
 	 * @param owner
 	 * @param mined
@@ -68,11 +78,11 @@ public class Turtle implements ConfigurationSerializable {
 	 * @param obeyCreative
 	 * @param penDown
 	 * @param bookmarks 
+	 * @param pointing
 	 */
-	private Turtle(String name, Location loc, Material mat, ItemStack[] inv, String owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks) {
+	private Turtle(String name, Location loc, ItemStack[] inv, String owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks, BlockFace pointing) {
 		this.name = name.replace(' ','_');
 		this.loc = loc;
-		this.mat = mat;
 		this.inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
 		this.inv.setContents(inv);
 		this.owner = owner;
@@ -81,18 +91,14 @@ public class Turtle implements ConfigurationSerializable {
 		this.obeyCreative = obeyCreative;
 		this.penDown = penDown;
 		this.bookmarks = bookmarks;
-
-		
-
+		this.pointing = pointing;
 	}
-	
 	
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();
 		map.put("name", getName());
 		map.put("loc", getLocation());
-		map.put("material", getMaterial().name());
 		map.put("inv", getInventory().getContents());
 		map.put("owner", getOwnerName());
 		map.put("mined", getMined());
@@ -100,16 +106,15 @@ public class Turtle implements ConfigurationSerializable {
 		map.put("obeyCreative", obeyCreative);
 		map.put("penDown", penDown.name());
 		map.put("bookmarks", bookmarks);
+		map.put("pointing", pointing);
 		
 		return map;
-		
 	}
 	
 	public static Turtle deserialize(Map<String, Object> map) {
 		
 		String name = (String)map.get("name");
 		Location loc = (Location)map.get("loc"); //the current turtle location
-		final Material mat = Material.matchMaterial((String)map.get("material"));
 		//Script script
 		
 		ItemStack[] inv = ((List<ItemStack>) map.get("inv")).toArray(new ItemStack[0]);
@@ -119,25 +124,33 @@ public class Turtle implements ConfigurationSerializable {
 		boolean obeyCreative = (boolean)map.get("obeyCreative");
 		Material penDown = Material.matchMaterial((String)map.get("penDown"));
 		Map<String, Location> bookmarks = (HashMap<String, Location>)map.get("bookmarks");
+		BlockFace pointing = (BlockFace)map.get("pointing");
 		
-		return new Turtle(name, loc, mat, inv, owner, mined, placed, obeyCreative, penDown, bookmarks);
+		return new Turtle(name, loc, inv, owner, mined, placed, obeyCreative, penDown, bookmarks, pointing);
 	}
 	
 	/**
-	 * Should be called when removing turtle from world
+	 * Should be called when removing turtle from world or reloading the plugin
 	 */
-	public void destroy() {
+	public void destroy(boolean removeFromWorld) {
 //		if (isRunning())
 //			stop();
 		for (ItemStack is : getInventory().getContents())
 			if (is != null)
 				loc.getWorld().dropItem(loc.add(.5, .5, .5), is);
 		inv.clear();
-		loc.getBlock().breakNaturally();
+		if (removeFromWorld) {
+			loc.getBlock().breakNaturally();
+		}
 		if (!KDebug.isCalledFrom("TurtleMgr")) {
 			TurtleMgr.getInstance().remove(this.getName());
 		}
-		
+		shutdownTasks();
+	}
+	public void shutdownTasks() {
+		if (blinkTask != null) {
+			blinkTask.cancel();
+		}
 	}
 	
 	//==========================================================================
@@ -184,32 +197,43 @@ public class Turtle implements ConfigurationSerializable {
 	}
 	
 	/**
-	 * Get the type of material the turtle is made from
-	 * @return Material
-	 */
-	public Material getMaterial() {
-		return mat;
-	}
-	
-	/**
 	 * Get the direction the turtle is facing
 	 * @return Cardinal direction BlockFace.{NORTH, EAST, SOUTH, WEST}
 	 */
-	public BlockFace getDir() {
-		
-		try {
-			//@todo what happens if the block is not directional?
-			//@note throws an exception which we catch. Should be able to use reflection...
-			Block b = this.loc.getBlock();
-			BlockState state = b.getState();
-			Directional d = ((Directional) state.getData());
-			return d.getFacing();
-
-		} catch (ClassCastException e) {
-			System.out.println("Is not Instance");
-			return null;
+	public BlockFace getFacing() {
+		if (pointing == null) {
+			//read the blocks direction
+			pointing = dir(null);
 		}
+		
+		return pointing;
 	}
+	/**
+	 * Block direction utility
+	 * 
+	 * @param facing the direction set the block to, or null to read block direction
+	 * @return the direction the block is facing
+	 */
+	private BlockFace dir(BlockFace facing) {
+		try {
+			BlockState state = loc.getBlock().getState();
+			MaterialData data = state.getData();
+
+			if (data instanceof Directional) {
+				Directional d = ((Directional)data);
+				if (facing == null) {
+					return d.getFacing();
+				} else {
+					d.setFacingDirection(facing);
+					state.update();
+				}
+			}
+			
+		} catch (ClassCastException e) {
+		}
+		return facing;
+	}
+	
 	/**
 	 * When the turtle's pen is down it places the penDown material when it moves
 	 * @return true if turtle's pen is down, false otherwise
@@ -359,14 +383,14 @@ public class Turtle implements ConfigurationSerializable {
 			out = BlockFace.DOWN;
 		}
 		if (face.equalsIgnoreCase("FORWARD")) {
-			out = getDir();
+			out = getFacing();
 		}
 		if (face.equalsIgnoreCase("BACK")) {
-			out = getDir().getOppositeFace();
+			out = getFacing().getOppositeFace();
 		}
 		if (face.equalsIgnoreCase("RIGHT") || face.equalsIgnoreCase("LEFT")) {
 			BlockFace[] dirs = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
-			int s = java.util.Arrays.asList(dirs).indexOf(getDir());
+			int s = java.util.Arrays.asList(dirs).indexOf(getFacing());
 			if (face.equalsIgnoreCase("RIGHT")) {
 				s ++;
 			}
@@ -470,35 +494,24 @@ public class Turtle implements ConfigurationSerializable {
 		Material mt = Material.getMaterial(mat.toUpperCase());
 		return place(bf, mt);
 	}
-
+	
 	/**
 	 * Move the turtle to the newloc
 	 * Does not check if there is a block in the way
 	 * @param newloc new location to move to 
 	 * @param facing direction to face
-	 * @return success
 	 */
-	public boolean setLocation(Location newloc, BlockFace facing) {
+	public void setLocation(Location newloc, BlockFace facing) {
 		this.loc.getBlock().setType(penDown);
 		if (penDown != Material.AIR) {
 			placed ++;
 		}
 		this.loc = newloc;
 		Block b = loc.getBlock();
-		b.setType(mat);
-		try {
-			//@todo what happens if the block is not directional?
-			//@note throws an exception which we catch. Should be able to use reflection...
-			BlockState state = b.getState();
-			Directional d = ((Directional)state.getData());
-			d.setFacingDirection(facing);
-			state.update();
-			System.out.println("Is Instance");
-			return true;
-		} catch (ClassCastException e) {
-			System.err.println("Is not Instance");
-		}
-		return false;
+		b.setType(TURTLE_MATERIAL);
+
+		pointing = dir(facing);
+	
 	}
 
 	/**
@@ -512,7 +525,7 @@ public class Turtle implements ConfigurationSerializable {
 			System.out.println("Can't move, "+l.getBlock().getType()+" block in the way.");
 			return false;
 		}
-		setLocation(l, getDir());
+		setLocation(l, getFacing());
 		return true;
 	}
 	
@@ -534,24 +547,20 @@ public class Turtle implements ConfigurationSerializable {
 	/**
 	 * Turn the turtle
 	 * @param dir direction to head
-	 * @return success
 	 */
-	public boolean rotate(BlockFace dir) {
-		return setLocation(this.loc, dir);
+	public void rotate(BlockFace dir) {
+		setLocation(this.loc, dir);
 	}
 	
 	/**
 	 * Turn the turtle
 	 * Automatically resolve strings to the proper BlockFace
 	 * @param dir direction to head
-	 * @return success
 	 */
-	public boolean rotate(String dir) {
+	public void rotate(String dir) {
 		BlockFace out = str2BlockFace(dir);
-		if (out == null) {
-			return false;
-		} else {
-			return rotate(out);
+		if (out != null) {
+			rotate(out);
 		}
 	}
 	
@@ -574,20 +583,12 @@ public class Turtle implements ConfigurationSerializable {
 	public boolean goBookmark(String name) {
 		
 		if (bookmarks.containsKey(name)) {
-			setLocation(bookmarks.get(name), getDir());
+			setLocation(bookmarks.get(name), getFacing());
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
-	/*
-		create a firework at the given location
-	  */
-//	  function bukkitFirework( location ) {
-//		var Color = org.bukkit.Color;
-//		var bkFireworkEffect = org.bukkit.FireworkEffect;
-//		var bkEntityType = org.bukkit.entity.EntityType;
 
 	/**
 	 * Get a random number between min and max, inclusive of both min and max
@@ -598,12 +599,12 @@ public class Turtle implements ConfigurationSerializable {
 	private int randInt (int min, int max ) {
 		return ThreadLocalRandom.current().nextInt(min, max + 1);
 	}
+	
 	/**
 	 * Get one of the colors by idx
 	 * @param idx
 	 * @return Color
 	 */
-	
 	private Color getColor(int idx) {
 		Color[] colors = {Color.AQUA, Color.BLACK, Color.BLUE, Color.FUCHSIA, 
 			Color.GRAY,	Color.GREEN, Color.LIME, Color.MAROON, Color.NAVY, 
@@ -635,6 +636,7 @@ public class Turtle implements ConfigurationSerializable {
 	/**
 	 * Make a firework at the turtle's current location
 	 * Great for identifying where the turtle is when you loose him.
+	 * https://bukkit.org/threads/spawn-firework.118019/
 	 */
     public void makeFirework() {              
 
@@ -660,6 +662,57 @@ public class Turtle implements ConfigurationSerializable {
 		//Then apply this to our rocket
 		fw.setFireworkMeta(fwm);                  
     }
+	
+	public void blink() {
+		long delay = 0;
+		long period = 10; //is about 1/2 sec
+
+		if (blinkTask == null) {
+			blinkTask = new BlinkTask();
+			blinkTask.runTaskTimer(Main.inst, delay, period);
+		} else {
+			blinkTask.cancel();
+			blinkTask = null;
+		}
+		
+	}
+	
+	class BlinkTask extends BukkitRunnable {
+		boolean isAltered = false;
+		@Override
+		public void run() {
+			if (isAltered) {
+				tempChangeMaterial(TURTLE_MATERIAL);
+			} else {
+				tempChangeMaterial(TURTLE_BLINK_MATERIAL);
+			}
+			isAltered = !isAltered;
+		}
+		
+		@Override
+		public synchronized void cancel() {
+			super.cancel();
+			if (isAltered) {
+				run();
+			}
+			
+		}
+		
+	}
+	
+	/**
+	 * Temporarly change the material of the turtle.
+	 * @todo this has potentially negative side-effects on the handling of the 
+	 * block break event. SHould a player try to break a turtle while it has a different
+	 * material than the TURTLE_MATERIAL the handler will not run the actions.
+	 * @param m 
+	 */
+	private void tempChangeMaterial(Material m) {
+		this.loc.getBlock().setType(m);
+		BlockFace f = getFacing();
+		dir(f);
+	}
+	
 	
 
 //	public void setScript(Script script) {

@@ -49,6 +49,9 @@ public class WebServer {
 		extractResources("web", Main.inst.getDataFolder());
 	}
 	
+	/**
+	 * Start the HTTP server thread
+	 */
 	public void start() {
 		try {
 			server = HttpServer.create(new InetSocketAddress(8000), 0);
@@ -93,6 +96,13 @@ public class WebServer {
         }
     }
 	
+	/**
+	 * Extract the files with the prefix 'path' to 'out'
+	 * Used to extract the web/ files to the plugin data directory
+	 * Based on code from http://stackoverflow.com/questions/11012819/how-can-i-get-a-resource-folder-from-inside-my-jar-file
+	 * @param path
+	 * @param out 
+	 */
 	private void extractResources(String path, File out) {
 //		final String path = "sample/folder";
 		final File jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());

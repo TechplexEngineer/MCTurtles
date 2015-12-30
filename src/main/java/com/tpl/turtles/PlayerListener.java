@@ -11,6 +11,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 
 public class PlayerListener implements Listener {
 	
@@ -21,7 +23,8 @@ public class PlayerListener implements Listener {
 	 */
 	@EventHandler
 	public void onBreak(BlockBreakEvent event) {
-		if (event.getBlock().getType() != Main.TURTLE_MATERIAL)
+		Material m = event.getBlock().getType();
+		if (m != Turtle.TURTLE_MATERIAL && m != Turtle.TURTLE_BLINK_MATERIAL)
 			return;
 		Turtle t = TurtleMgr.getInstance().getByLoc(event.getBlock().getLocation());
 		if (t == null)
@@ -32,7 +35,7 @@ public class PlayerListener implements Listener {
 		} else {
 			event.setCancelled(true);
 			event.getPlayer().sendMessage(ChatColor.RED + "Destroyed turtle " + t.getName());
-			t.destroy();
+			t.destroy(true);
 		}
 	}
 	
@@ -44,7 +47,7 @@ public class PlayerListener implements Listener {
 	public void onOpeninv(PlayerInteractEvent event) {
 		if (event.getPlayer().isSneaking() 
 				|| event.getClickedBlock() == null 
-				|| event.getClickedBlock().getType() != Main.TURTLE_MATERIAL
+				|| event.getClickedBlock().getType() != Turtle.TURTLE_MATERIAL
 				|| event.getAction() == Action.LEFT_CLICK_BLOCK) {
 			return;
 		}
@@ -53,7 +56,7 @@ public class PlayerListener implements Listener {
 		Turtle t = TurtleMgr.getInstance().getByLoc(blk.getLocation());
 		if (t == null) {
 			Player player = event.getPlayer();
-			if (player.getItemInHand().getType() == Main.TURTLEWAND_MATERIAL) {
+			if (player.getItemInHand().getType() == Turtle.TURTLEWAND_MATERIAL) {
 				createTurtle(p, blk.getLocation());
 				event.setCancelled(true);
 			}
@@ -86,7 +89,8 @@ public class PlayerListener implements Listener {
 				System.out.println("Creating new turtle named:"+name);
 				Turtle t = TurtleMgr.getInstance().getByName(name);
 				if (t == null) {
-					t = TurtleMgr.getInstance().getNewTurtle(name, Main.TURTLE_MATERIAL, l, player.getName());
+					//@todo Get direction
+					t = TurtleMgr.getInstance().getNewTurtle(name, l, player.getName());
 					player.sendMessage(ChatColor.GREEN + "Created turtle: " + t.getName());
 				} else {
 					player.sendMessage(ChatColor.RED + "A turtle with that name already exists.");

@@ -27,7 +27,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 	private static final String[] DIR_STRINGS = {"NORTH", "SOUTH", "EAST", "WEST", "UP", "DOWN", "RIGHT", "LEFT", "FORWARD", "BACK"};
 	private static final String DIR_STRING = StringUtils.join(DIR_STRINGS, "|");
 	
-	private static final String[] CMDS_STRINGS = {"delete","move", "rotate", "mine", "place", "bookmark", "goBookmark", "firework"};
+	private static final String[] CMDS_STRINGS = {"delete","move", "rotate", "mine", "place", "blink", "bookmark", "goBookmark", "firework"};
 	private static final String CMD_STRING = StringUtils.join(CMDS_STRINGS,"|");
 	
 	private static final List<String> mats = new ArrayList<>();
@@ -76,13 +76,13 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 				return false;
 			}
 
-			ItemStack rod = new ItemStack(Main.TURTLEWAND_MATERIAL);
+			ItemStack rod = new ItemStack(Turtle.TURTLEWAND_MATERIAL);
 			ItemMeta im = rod.getItemMeta();
 			im.setDisplayName("Create a Turtle");
 			rod.setItemMeta(im);
 			p.getInventory().addItem(rod);
-			p.getInventory().addItem(new ItemStack(Main.TURTLE_MATERIAL));
-			sender.sendMessage(ChatColor.GREEN + "Click with this wand on a " + Main.TURTLE_MATERIAL.toString() + " to create a turtle.");
+			p.getInventory().addItem(new ItemStack(Turtle.TURTLE_MATERIAL));
+			sender.sendMessage(ChatColor.GREEN + "Click with this wand on a " + Turtle.TURTLE_MATERIAL.toString() + " to create a turtle.");
 
 			return true;
 		}
@@ -133,13 +133,17 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		}
 		
 		if(act.equalsIgnoreCase("delete")) {
-			t.destroy();
-
+			t.destroy(true);
 			return true;
 		}
+		
 		if(act.equalsIgnoreCase("fw") || act.equalsIgnoreCase("firework")) {
 			t.makeFirework();
-
+			return true;
+		}
+		
+		if(act.equalsIgnoreCase("blink")) {
+			t.blink();
 			return true;
 		}
 		

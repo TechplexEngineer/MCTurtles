@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 
 
 /**
@@ -30,9 +31,9 @@ public class TurtleMgr  {
    }
 	private final List<Turtle> TURTLES = new ArrayList<>();
 	
-	public Turtle getNewTurtle(String name, Material mat, Location loc, String owner) 
+	public Turtle getNewTurtle(String name,  Location loc, String owner) 
 	{
-		Turtle t = new Turtle(name, mat, loc, owner);
+		Turtle t = new Turtle(name, loc, owner);
 		add(t);
 		return t;
 	}
@@ -77,7 +78,7 @@ public class TurtleMgr  {
 	 */
 	public void remove(String name) {
 		Turtle t = getByName(name);
-		t.destroy();
+		t.destroy(true);
 		TURTLES.remove(t);
 	}
 

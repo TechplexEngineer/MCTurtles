@@ -21,10 +21,6 @@ public class Main extends JavaPlugin {
 
 	public static Main inst;
 	public FileConfiguration config;
-	public static final Material TURTLE_MATERIAL = Material.DISPENSER; //@note use a directioal block
-	public static final Material TURTLEWAND_MATERIAL = Material.BLAZE_ROD;
-	
-	//@note continued: use one of: Banner, Bed, Button, Chest, CocoaPlant, Diode, DirectionalContainer, Dispenser, Door, EnderChest, Furnace, FurnaceAndDispenser, Gate, Ladder, Lever, PistonBaseMaterial, PistonExtensionMaterial, Pumpkin, RedstoneTorch, Sign, SimpleAttachableMaterialData, Skull, Stairs, Torch, TrapDoor, TripwireHook
 	
 	@Override
 	public void onEnable() {
@@ -46,6 +42,9 @@ public class Main extends JavaPlugin {
 	public void onDisable() {
 		persistTurtles();
 		WebServer.getInstance().stop();
+		for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
+			t.shutdownTasks();
+		}
 	}
 	
 	public void persistTurtles() {
