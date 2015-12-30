@@ -2,12 +2,14 @@ package com.tpl.turtles;
 
 
 import com.tpl.turtles.utils.KDebug;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -106,7 +108,7 @@ public class Turtle implements ConfigurationSerializable {
 		map.put("obeyCreative", obeyCreative);
 		map.put("penDown", penDown.name());
 		map.put("bookmarks", bookmarks);
-		map.put("pointing", pointing);
+		map.put("pointing", getFacing().name());
 		
 		return map;
 	}
@@ -124,10 +126,28 @@ public class Turtle implements ConfigurationSerializable {
 		boolean obeyCreative = (boolean)map.get("obeyCreative");
 		Material penDown = Material.matchMaterial((String)map.get("penDown"));
 		Map<String, Location> bookmarks = (HashMap<String, Location>)map.get("bookmarks");
-		BlockFace pointing = (BlockFace)map.get("pointing");
+		String p = (String)map.get("pointing");
+		BlockFace pointing = Turtle.getBlockFaceByString(p);
+				
 		
 		return new Turtle(name, loc, inv, owner, mined, placed, obeyCreative, penDown, bookmarks, pointing);
 	}
+	public static final Map<String, BlockFace> BLOCKFACE_BY_NAME = new HashMap<>();
+	
+	static {
+		for (BlockFace blockface : BlockFace.values()) {
+			BLOCKFACE_BY_NAME.put(blockface.name(), blockface);
+		}
+	}
+	public static BlockFace getBlockFaceByString(final String dir) {
+        Validate.notNull(dir, "Name cannot be null");
+		
+		String filtered = dir.toUpperCase();
+		filtered = filtered.replaceAll("\\s+", "_").replaceAll("\\W", "");
+		return BLOCKFACE_BY_NAME.get(filtered);
+
+    }
+
 	
 	/**
 	 * Should be called when removing turtle from world or reloading the plugin
@@ -147,6 +167,11 @@ public class Turtle implements ConfigurationSerializable {
 		}
 		shutdownTasks();
 	}
+	
+	/**
+	 * Its important to shutdown any tasks that are running when the bukkit server
+	 * reloads to minimize ill effects of having old tasks running.
+	 */
 	public void shutdownTasks() {
 		if (blinkTask != null) {
 			blinkTask.cancel();
@@ -663,7 +688,12 @@ public class Turtle implements ConfigurationSerializable {
 		fw.setFireworkMeta(fwm);                  
     }
 	
-	public void blink() {
+	/**
+	 * Make the turtle blink about once every 1/2 a second to make it easier for
+	 * the programmer to keep track of it.
+	 * Call toggleBlink once to start the blinking and call toggleBlink again to stop.
+	 */
+	public void toggleBlink() {
 		long delay = 0;
 		long period = 10; //is about 1/2 sec
 
@@ -676,7 +706,9 @@ public class Turtle implements ConfigurationSerializable {
 		}
 		
 	}
-	
+	/**
+	 * Used to make the turtle blink for the programmer's sanity to find their turtle.
+	 */
 	class BlinkTask extends BukkitRunnable {
 		boolean isAltered = false;
 		@Override
@@ -701,10 +733,8 @@ public class Turtle implements ConfigurationSerializable {
 	}
 	
 	/**
-	 * Temporarly change the material of the turtle.
-	 * @todo this has potentially negative side-effects on the handling of the 
-	 * block break event. SHould a player try to break a turtle while it has a different
-	 * material than the TURTLE_MATERIAL the handler will not run the actions.
+	 * Temporarily change the material of the turtle.
+	 * Great for making our blink effect.
 	 * @param m 
 	 */
 	private void tempChangeMaterial(Material m) {

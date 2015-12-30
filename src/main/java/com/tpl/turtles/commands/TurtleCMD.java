@@ -143,7 +143,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		}
 		
 		if(act.equalsIgnoreCase("blink")) {
-			t.blink();
+			t.toggleBlink();
 			return true;
 		}
 		
