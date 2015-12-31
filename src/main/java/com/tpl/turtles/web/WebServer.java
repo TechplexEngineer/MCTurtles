@@ -75,27 +75,27 @@ public class WebServer {
         @Override
         public void handle(HttpExchange t) throws IOException {
 
-			File file = new File(Main.inst.getDataFolder() + File.separator + "web" + File.separator + "index.html");
+			sendFile(t, "index.html");
+        }
+    }
+	
+	private static void sendFile(HttpExchange http, String path) throws IOException {
+		File file = new File(Main.inst.getDataFolder() + File.separator + "web" + File.separator + path);
 			if (!file.isFile()) {
 				// File does not exist or is not a file: reject with 404 error.
 				String response = "404 (Not Found)\n";
-				t.sendResponseHeaders(404, response.length());
-				OutputStream os = t.getResponseBody();
+				http.sendResponseHeaders(404, response.length());
+				OutputStream os = http.getResponseBody();
 				os.write(response.getBytes());
 				os.close();
 			} else {
 				InputStream stream = new FileInputStream(file);
-
-				StringWriter resp = new StringWriter();
-				IOUtils.copy(stream, resp, "UTF-8");
-				String response = resp.toString();
-				t.sendResponseHeaders(200, response.length());
-				try (OutputStream os = t.getResponseBody()) {
-					os.write(response.getBytes());
+				http.sendResponseHeaders(200, file.length());
+				try (OutputStream os = http.getResponseBody()) {
+					IOUtils.copy(stream, os);
 				}
 			}
-        }
-    }
+	}
 	
 	static class update implements HttpHandler {
         @Override
