@@ -15,8 +15,10 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import com.tpl.turtles.Main;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -72,13 +74,26 @@ public class WebServer {
     static class index implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            String response = "<!DOCTYPE html>\n<html><head><title>fred</title></head><body><h1>test</h1><form action=\"\" method=\"post\"><textarea name=\"fred\"></textarea></form></body></html>";
-			Headers h = t.getResponseHeaders();
-			h.add("Content-Type", "text/html");
-            t.sendResponseHeaders(200, response.length());
-            OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+
+			File file = new File(Main.inst.getDataFolder() + File.separator + "web" + File.separator + "index.html");
+			if (!file.isFile()) {
+				// File does not exist or is not a file: reject with 404 error.
+				String response = "404 (Not Found)\n";
+				t.sendResponseHeaders(404, response.length());
+				OutputStream os = t.getResponseBody();
+				os.write(response.getBytes());
+				os.close();
+			} else {
+				InputStream stream = new FileInputStream(file);
+
+				StringWriter resp = new StringWriter();
+				IOUtils.copy(stream, resp, "UTF-8");
+				String response = resp.toString();
+				t.sendResponseHeaders(200, response.length());
+				try (OutputStream os = t.getResponseBody()) {
+					os.write(response.getBytes());
+				}
+			}
         }
     }
 	
@@ -88,11 +103,11 @@ public class WebServer {
 			InputStream bodyStream = t.getRequestBody();
 			StringWriter body = new StringWriter();
 			IOUtils.copy(bodyStream, body, "UTF-8");
-            String response = body.toString();
-            t.sendResponseHeaders(200, response.length());
-            OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+			String response = body.toString();
+			t.sendResponseHeaders(200, response.length());
+			try (OutputStream os = t.getResponseBody()) {
+				os.write(response.getBytes());
+			}
         }
     }
 	
