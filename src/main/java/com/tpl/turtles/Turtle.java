@@ -151,6 +151,7 @@ public class Turtle implements ConfigurationSerializable {
 	
 	/**
 	 * Should be called when removing turtle from world or reloading the plugin
+	 * @param removeFromWorld set to true to remove the turtle from the world
 	 */
 	public void destroy(boolean removeFromWorld) {
 //		if (isRunning())
