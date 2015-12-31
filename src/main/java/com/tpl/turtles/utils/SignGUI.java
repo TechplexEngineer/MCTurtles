@@ -1,7 +1,3 @@
-
-
-// From https://bukkit.org/threads/sign-gui-use-the-sign-interface-to-get-user-input.177030/
-
 package com.tpl.turtles.utils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -24,7 +20,10 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 
-
+/**
+ * From https://bukkit.org/threads/sign-gui-use-the-sign-interface-to-get-user-input.177030/
+ * @author techplex
+ */
 public class SignGUI {
     protected ProtocolManager protocolManager;
     protected PacketAdapter packetListener;

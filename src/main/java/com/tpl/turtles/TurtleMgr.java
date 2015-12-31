@@ -1,17 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.tpl.turtles;
-
 
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 
+import org.bukkit.Location;
 
 /**
  * Manage a list of turtles

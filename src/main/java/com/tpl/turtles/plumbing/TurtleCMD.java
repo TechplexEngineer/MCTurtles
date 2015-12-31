@@ -1,7 +1,5 @@
-package com.tpl.turtles.commands;
+package com.tpl.turtles.plumbing;
 
-import com.tpl.turtles.DocBook;
-import com.tpl.turtles.Main;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,16 +9,15 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-
-//import me.Mark.MT.Script;
-import com.tpl.turtles.Turtle;
-import com.tpl.turtles.TurtleMgr;
-import com.tpl.turtles.utils.Book;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.tpl.turtles.Turtle;
+import com.tpl.turtles.TurtleMgr;
+import com.tpl.turtles.utils.Book;
 
 public class TurtleCMD implements CommandExecutor, TabCompleter {
 	

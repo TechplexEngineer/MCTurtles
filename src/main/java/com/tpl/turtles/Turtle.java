@@ -1,14 +1,10 @@
 package com.tpl.turtles;
 
-
-import com.tpl.turtles.utils.KDebug;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -29,7 +25,9 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+
+import com.tpl.turtles.plumbing.Main;
+import com.tpl.turtles.utils.KDebug;
 
 public class Turtle implements ConfigurationSerializable {
 

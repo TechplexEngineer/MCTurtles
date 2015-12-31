@@ -1,11 +1,9 @@
-package com.tpl.turtles.commands;
+package com.tpl.turtles.plumbing;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import com.tpl.turtles.Main;
 
 public class ReloadCMD implements CommandExecutor {
 
