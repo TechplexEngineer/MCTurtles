@@ -60,8 +60,10 @@ public class WebServer {
     }
 	
 	public void stop() {
-		server.stop(2);
-		server = null;
+		if (server != null) {
+			server.stop(2);
+			server = null;
+		}
 	}
 
     static class index implements HttpHandler {

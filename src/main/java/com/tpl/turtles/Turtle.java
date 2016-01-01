@@ -28,6 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.tpl.turtles.plumbing.Main;
 import com.tpl.turtles.utils.KDebug;
+import java.util.UUID;
 
 public class Turtle implements ConfigurationSerializable {
 
@@ -38,7 +39,7 @@ public class Turtle implements ConfigurationSerializable {
 	private Location loc; //the current turtle location
 //	private Script script
 	private final Inventory inv;
-	private String owner;
+	private Player owner;
 	private int mined = 0, placed = 0;
 	private boolean obeyCreative = true;
 	private Material penDown = Material.AIR;
@@ -63,7 +64,7 @@ public class Turtle implements ConfigurationSerializable {
 		}
 		this.name = name.replace(' ','_'); // @note names cannot contain spaces
 		this.loc = loc;
-		this.owner = owner;
+		this.owner = Bukkit.getPlayer(owner);
 		inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
 		bookmarks = new HashMap<>();
 	}
@@ -80,7 +81,7 @@ public class Turtle implements ConfigurationSerializable {
 	 * @param bookmarks 
 	 * @param pointing
 	 */
-	private Turtle(String name, Location loc, ItemStack[] inv, String owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks, BlockFace pointing) {
+	private Turtle(String name, Location loc, ItemStack[] inv, Player owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks, BlockFace pointing) {
 		this.name = name.replace(' ','_');
 		this.loc = loc;
 		this.inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
@@ -100,7 +101,7 @@ public class Turtle implements ConfigurationSerializable {
 		map.put("name", getName());
 		map.put("loc", getLocation());
 		map.put("inv", getInventory().getContents());
-		map.put("owner", getOwnerName());
+		map.put("owner", getOwner().getUniqueId().toString()); //@todo probably should be a uuid
 		map.put("mined", getMined());
 		map.put("placed", getPlaced());
 		map.put("obeyCreative", obeyCreative);
@@ -118,7 +119,7 @@ public class Turtle implements ConfigurationSerializable {
 		//Script script
 		
 		ItemStack[] inv = ((List<ItemStack>) map.get("inv")).toArray(new ItemStack[0]);
-		String owner = (String)map.get("owner");
+		UUID owner_uuid = UUID.fromString((String)map.get("owner"));
 		int mined = (int)map.get("mined");
 		int placed = (int)map.get("placed");
 		boolean obeyCreative = (boolean)map.get("obeyCreative");
@@ -126,7 +127,8 @@ public class Turtle implements ConfigurationSerializable {
 		Map<String, Location> bookmarks = (HashMap<String, Location>)map.get("bookmarks");
 		String p = (String)map.get("pointing");
 		BlockFace pointing = Turtle.getBlockFaceByString(p);
-				
+		
+		Player owner = Bukkit.getPlayer(owner_uuid);
 		
 		return new Turtle(name, loc, inv, owner, mined, placed, obeyCreative, penDown, bookmarks, pointing);
 	}
@@ -185,7 +187,7 @@ public class Turtle implements ConfigurationSerializable {
 	 * @return Player
 	 */
 	public Player getOwner() {
-		return Bukkit.getPlayer(owner);
+		return owner;
 	}
 	
 	/**
@@ -193,7 +195,7 @@ public class Turtle implements ConfigurationSerializable {
 	 * @return owner's name
 	 */
 	public String getOwnerName() {
-		return owner;
+		return owner.getName();
 	}
 
 	/**
@@ -299,6 +301,14 @@ public class Turtle implements ConfigurationSerializable {
 	 * @param owner 
 	 */
 	public void setOwner(String owner) {
+		this.owner = Bukkit.getPlayer(owner);
+	}
+	
+	/**
+	 * Change the turtle's owner
+	 * @param owner 
+	 */
+	public void setOwner(Player owner) {
 		this.owner = owner;
 	}
 
