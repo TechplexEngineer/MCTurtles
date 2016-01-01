@@ -239,7 +239,6 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 
 			//update the ItemStack with this new meta
 			book.setItemMeta(bookMeta);
-			
 
 			p.getInventory().addItem(book);
 
@@ -266,6 +265,21 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			}
 		}
 		
+		if(act.equalsIgnoreCase("js")) {
+			if (args.length >= 3) {
+				StringBuilder sb = new StringBuilder();
+				for (int i = 2; i < args.length; i++) {
+					sb.append(args[i]);
+					sb.append(" ");
+				}
+				t.js(sb.toString());
+				return true;
+			} else {
+				sender.sendMessage("/t <turtle> js <javascript>");
+				return false;
+			}
+		}
+
 		//else send them the usage message
 		sender.sendMessage("/t <turtle> "+CMD_STRING+" ...");
 		

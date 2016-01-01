@@ -13,8 +13,9 @@ import org.bukkit.Location;
 public class TurtleMgr  {
 	
 	private static TurtleMgr inst = null;
-	private TurtleMgr () {
-		
+	private List<Turtle> TURTLES;
+	protected TurtleMgr () {
+		TURTLES = new ArrayList<>();
 	}
 	public static TurtleMgr getInstance() {
       if(inst == null) {
@@ -22,12 +23,14 @@ public class TurtleMgr  {
       }
       return inst;
 	}
-	private List<Turtle> TURTLES = new ArrayList<>();
+	
+	/**
+	 * Static variables are not cleared when bukkit reloads the plugin.
+	 */
 	public void cleanup() {
 		for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
 			t.shutdownTasks();
 		}
-		TURTLES = new ArrayList<>();
 		TurtleMgr.inst = null;
 	}
 	

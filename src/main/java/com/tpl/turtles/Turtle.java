@@ -32,7 +32,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.tpl.turtles.plumbing.Main;
 import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.utils.KDebug;
-import com.tpl.turtles.utils.SerializablePlayer;
 import org.bukkit.OfflinePlayer;
 
 public class Turtle implements ConfigurationSerializable {

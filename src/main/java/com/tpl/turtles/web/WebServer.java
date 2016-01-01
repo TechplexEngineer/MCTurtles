@@ -58,7 +58,9 @@ public class WebServer {
 			ex.printStackTrace();
 		}
     }
-	
+	/**
+	 * Stop the server and cleanup any resources
+	 */
 	public void stop() {
 		if (server != null) {
 			server.stop(2);

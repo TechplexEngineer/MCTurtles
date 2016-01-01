@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
+import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.web.WebServer;
 
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -26,7 +27,6 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		//Tell the serializer/deserializer about new serializeable classes
 		ConfigurationSerialization.registerClass(Turtle.class);
-		ConfigurationSerialization.registerClass(SerializablePlayer.class);
 
 		inst = this;
 		configs();
@@ -41,11 +41,15 @@ public class Main extends JavaPlugin {
 		WebServer.getInstance().start();
 	}
 
+	/**
+	 * Cleanup any static resources and stop any running tasks
+	 */
 	@Override
 	public void onDisable() {
 		persistTurtles();
 		WebServer.getInstance().stop();
 		TurtleMgr.getInstance().cleanup();
+		Scripting.getInstance().cleanup();
 	}
 	
 	public void persistTurtles() {
