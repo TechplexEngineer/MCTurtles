@@ -2,6 +2,7 @@ package com.tpl.turtles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Location;
 
@@ -20,10 +21,17 @@ public class TurtleMgr  {
          inst = new TurtleMgr();
       }
       return inst;
-   }
-	private final List<Turtle> TURTLES = new ArrayList<>();
+	}
+	private List<Turtle> TURTLES = new ArrayList<>();
+	public void cleanup() {
+		for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
+			t.shutdownTasks();
+		}
+		TURTLES = new ArrayList<>();
+		TurtleMgr.inst = null;
+	}
 	
-	public Turtle getNewTurtle(String name,  Location loc, String owner) 
+	public Turtle getNewTurtle(String name,  Location loc, UUID owner) 
 	{
 		Turtle t = new Turtle(name, loc, owner);
 		add(t);
@@ -59,9 +67,12 @@ public class TurtleMgr  {
 	 * @param turtles list of turtles to add
 	 */
 	public void addEach(List<Turtle> turtles) {
-		for(Turtle t : turtles) {
-			add(t);
+		if (turtles != null) {
+			for (Turtle t : turtles) {
+				add(t);
+			}
 		}
+		
 	}
 	
 	/**

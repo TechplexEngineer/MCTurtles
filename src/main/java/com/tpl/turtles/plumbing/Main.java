@@ -24,7 +24,10 @@ public class Main extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		//Tell the serializer/deserializer about new serializeable classes
 		ConfigurationSerialization.registerClass(Turtle.class);
+		ConfigurationSerialization.registerClass(SerializablePlayer.class);
+
 		inst = this;
 		configs();
 		PluginManager pm = Bukkit.getPluginManager();
@@ -42,9 +45,7 @@ public class Main extends JavaPlugin {
 	public void onDisable() {
 		persistTurtles();
 		WebServer.getInstance().stop();
-		for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
-			t.shutdownTasks();
-		}
+		TurtleMgr.getInstance().cleanup();
 	}
 	
 	public void persistTurtles() {
@@ -60,15 +61,17 @@ public class Main extends JavaPlugin {
 		YamlConfiguration c = new YamlConfiguration();
 		try {
 			File f = new File(getDataFolder() + File.separator + "turtles.yml");
-			if (!f.exists())
+			if (!f.exists()) {
 				f.createNewFile();
-			if (f.length() > 10) {
+			} else {
 				c.load(f);
 				List<Turtle> t = (List<Turtle>)c.get("Turtles"); //@note in the process of deseralizing TurtleMgr all of the turtles are added to the singleton
-				TurtleMgr.getInstance().addEach(t);
-				return t.size();
-			} else {
-				System.out.println("------ The file turtles.yml is too short"+f.length());
+				if (t != null) {
+					TurtleMgr.getInstance().addEach(t);
+					return t.size();
+				} else {
+					return 0;
+				}
 			}
 
 		} catch (IOException | InvalidConfigurationException e) {

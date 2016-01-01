@@ -31,7 +31,7 @@ public class PlayerListener implements Listener {
 		Turtle t = TurtleMgr.getInstance().getByLoc(event.getBlock().getLocation());
 		if (t == null)
 			return;
-		if (!event.getPlayer().getName().equalsIgnoreCase(t.getOwner().getName()) && !event.getPlayer().isOp()) {
+		if (!event.getPlayer().getName().equalsIgnoreCase(t.getOwnerName()) && !event.getPlayer().isOp()) {
 			event.setCancelled(true);
 			event.getPlayer().sendMessage(ChatColor.RED + "You do not own this turtle.");
 		} else {
@@ -64,7 +64,7 @@ public class PlayerListener implements Listener {
 			}
 			return;
 		}
-		if (!t.getOwner().getName().equalsIgnoreCase(p.getName())) {
+		if (!t.getOwnerName().equalsIgnoreCase(p.getName())) {
 			p.sendMessage(ChatColor.RED + "You do not own this turtle!");
 			return;
 		}
@@ -92,7 +92,7 @@ public class PlayerListener implements Listener {
 				Turtle t = TurtleMgr.getInstance().getByName(name);
 				if (t == null) {
 					//@todo Get direction
-					t = TurtleMgr.getInstance().getNewTurtle(name, l, player.getName());
+					t = TurtleMgr.getInstance().getNewTurtle(name, l, player.getUniqueId());
 					player.sendMessage(ChatColor.GREEN + "Created turtle: " + t.getName());
 				} else {
 					player.sendMessage(ChatColor.RED + "A turtle with that name already exists.");

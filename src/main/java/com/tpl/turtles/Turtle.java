@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.UUID;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -27,8 +30,10 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.tpl.turtles.plumbing.Main;
+import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.utils.KDebug;
-import java.util.UUID;
+import com.tpl.turtles.utils.SerializablePlayer;
+import org.bukkit.OfflinePlayer;
 
 public class Turtle implements ConfigurationSerializable {
 
@@ -39,7 +44,7 @@ public class Turtle implements ConfigurationSerializable {
 	private Location loc; //the current turtle location
 //	private Script script
 	private final Inventory inv;
-	private Player owner;
+	private UUID owner;
 	private int mined = 0, placed = 0;
 	private boolean obeyCreative = true;
 	private Material penDown = Material.AIR;
@@ -57,19 +62,20 @@ public class Turtle implements ConfigurationSerializable {
     // Constructors & Destructors
     //==========================================================================
 
-	public Turtle(String name, Location loc, String owner) {
+	public Turtle(String name, Location loc, UUID owner) {
 		
 		if (!KDebug.isCalledFrom("TurtleMgr")) {
 			System.err.println("Invalid Invocation. Turtles SHOULD only be created from the TurtleMgr");
 		}
 		this.name = name.replace(' ','_'); // @note names cannot contain spaces
 		this.loc = loc;
-		this.owner = Bukkit.getPlayer(owner);
+		this.owner = owner;
 		inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
 		bookmarks = new HashMap<>();
 	}
 	/**
 	 * This constructor is used exclusively for serialization
+	 * 
 	 * @param name
 	 * @param loc
 	 * @param inv
@@ -81,9 +87,13 @@ public class Turtle implements ConfigurationSerializable {
 	 * @param bookmarks 
 	 * @param pointing
 	 */
-	private Turtle(String name, Location loc, ItemStack[] inv, Player owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks, BlockFace pointing) {
+	private Turtle(String name, Location loc, ItemStack[] inv, UUID owner, int mined, int placed, boolean obeyCreative, Material penDown, Map<String, Location> bookmarks, BlockFace pointing) {
 		this.name = name.replace(' ','_');
 		this.loc = loc;
+		if (loc.getBlock().getType() != TURTLE_MATERIAL) {
+			loc.getBlock().setType(TURTLE_MATERIAL);
+		}
+		
 		this.inv = Bukkit.createInventory(null, 9 * 4,  this.name + " the turtle");
 		this.inv.setContents(inv);
 		this.owner = owner;
@@ -101,7 +111,7 @@ public class Turtle implements ConfigurationSerializable {
 		map.put("name", getName());
 		map.put("loc", getLocation());
 		map.put("inv", getInventory().getContents());
-		map.put("owner", getOwner().getUniqueId().toString()); //@todo probably should be a uuid
+		map.put("owner", owner.toString()); //@todo probably should be a uuid
 		map.put("mined", getMined());
 		map.put("placed", getPlaced());
 		map.put("obeyCreative", obeyCreative);
@@ -116,10 +126,9 @@ public class Turtle implements ConfigurationSerializable {
 		
 		String name = (String)map.get("name");
 		Location loc = (Location)map.get("loc"); //the current turtle location
-		//Script script
 		
 		ItemStack[] inv = ((List<ItemStack>) map.get("inv")).toArray(new ItemStack[0]);
-		UUID owner_uuid = UUID.fromString((String)map.get("owner"));
+		UUID owner = UUID.fromString((String)map.get("owner"));
 		int mined = (int)map.get("mined");
 		int placed = (int)map.get("placed");
 		boolean obeyCreative = (boolean)map.get("obeyCreative");
@@ -127,8 +136,6 @@ public class Turtle implements ConfigurationSerializable {
 		Map<String, Location> bookmarks = (HashMap<String, Location>)map.get("bookmarks");
 		String p = (String)map.get("pointing");
 		BlockFace pointing = Turtle.getBlockFaceByString(p);
-		
-		Player owner = Bukkit.getPlayer(owner_uuid);
 		
 		return new Turtle(name, loc, inv, owner, mined, placed, obeyCreative, penDown, bookmarks, pointing);
 	}
@@ -184,10 +191,26 @@ public class Turtle implements ConfigurationSerializable {
     //==========================================================================
 	/**
 	 * Get the owner as a player object
-	 * @return Player
+	 * @return the owners uuid
 	 */
-	public Player getOwner() {
+	public UUID getOwner() {
 		return owner;
+	}
+	
+	/**
+	 * When placing blocks we need to check if the owner is in creative mode.
+	 * If we can't tell (because the owner is offline) then we'll assume creative.
+	 * @return the owners game mode
+	 */
+	private GameMode getOwnerGameMode() {
+		OfflinePlayer op = Bukkit.getOfflinePlayer(owner);
+		if(op.isOnline()) {
+			return Bukkit.getPlayer(owner).getGameMode();
+		}
+		else {
+			System.out.println("Player "+op.getName()+" is possibly offline. Assuming creative mode");
+			return GameMode.CREATIVE;
+		}
 	}
 	
 	/**
@@ -195,7 +218,8 @@ public class Turtle implements ConfigurationSerializable {
 	 * @return owner's name
 	 */
 	public String getOwnerName() {
-		return owner.getName();
+		OfflinePlayer op = Bukkit.getOfflinePlayer(owner);
+		return op.getName();
 	}
 
 	/**
@@ -300,15 +324,7 @@ public class Turtle implements ConfigurationSerializable {
 	 * Change the turtle's owner
 	 * @param owner 
 	 */
-	public void setOwner(String owner) {
-		this.owner = Bukkit.getPlayer(owner);
-	}
-	
-	/**
-	 * Change the turtle's owner
-	 * @param owner 
-	 */
-	public void setOwner(Player owner) {
+	public void setOwner(UUID owner) {
 		this.owner = owner;
 	}
 
@@ -498,7 +514,7 @@ public class Turtle implements ConfigurationSerializable {
 		// only place block in empty slot
 		if (b.getType() != Material.AIR)
 			return false;
-		if (obeyCreative && getOwner().getGameMode() == GameMode.CREATIVE) {
+		if (obeyCreative && getOwnerGameMode() == GameMode.CREATIVE) {
 			b.setType(mat);
 			placed++;
 			return true;
@@ -750,6 +766,16 @@ public class Turtle implements ConfigurationSerializable {
 		this.loc.getBlock().setType(m);
 		BlockFace f = getFacing();
 		dir(f);
+	}
+	
+	public void js(String js) {
+		ScriptEngine engine = Scripting.getInstance().getEngineFor(owner);
+		
+		try {
+			engine.eval(js);
+		} catch (ScriptException ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	

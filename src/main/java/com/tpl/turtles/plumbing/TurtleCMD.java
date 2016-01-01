@@ -102,14 +102,25 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			return true;
 		}
 		
+		if (args[0].equalsIgnoreCase("jstest")) {
+			String code = "var tm = com.tpl.turtles.TurtleMgr.getInstance();\n" +
+						"var turtles = tm.getTurtles();\n" +
+						"var turtle = turtles[0];\n" +
+						"turtle.move(org.bukkit.block.BlockFace.North);";
+			Turtle fred = TurtleMgr.getInstance().getByName("fred");
+			fred.js(code);
+			
+			return true;
+		}
+		
 		String name = args[0];
 		Turtle t = TurtleMgr.getInstance().getByName(name);
 		if (t == null) {
 			sender.sendMessage(ChatColor.RED + "Turtle " + name + " does not exist.");
 			return false;
 		}
-		Player owner = t.getOwner();
-		if (owner != sender) {
+
+		if (p != null && t.getOwner() != p.getUniqueId()) {
 			sender.sendMessage(ChatColor.RED + "You don't own that turtle.");
 			return false;
 		}
@@ -183,13 +194,16 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		}
 		
 		if(act.equalsIgnoreCase("book")) {
+			//@todo cleanup or remove
+			//Editing code in books is very much less than idea as one can't move
+			//theire cursor around.
 			if (!(sender instanceof Player)) {
 				sender.sendMessage(ChatColor.RED + "You must be a player!");
 				return false;
 			}
 			
 			ItemStack book;
-			if (p != t.getOwner()) {
+			if (p.getUniqueId() != t.getOwner()) {
 				sender.sendMessage("Sending non-editable MCTurtles-CommandBook as you are not the owner.");
 				book = new ItemStack(Material.WRITTEN_BOOK);
 			} else {
@@ -346,7 +360,8 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 				possibles.add("wand");
 			}
 			for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
-				if (sender != t.getOwner())
+				Player p = (Player)sender;
+				if (p.getUniqueId() != t.getOwner())
 					continue;
 				String name = t.getName();
 				if (args[0].length() == 0) {
