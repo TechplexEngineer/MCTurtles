@@ -1,18 +1,15 @@
 package com.tpl.turtles.scripting;
 
+import com.tpl.turtles.plumbing.Main;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.script.Bindings;
-import javax.script.ScriptContext;
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.SimpleBindings;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
-import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
 
 /**
  * Manage the script engines
@@ -53,7 +50,9 @@ public class Scripting {
 	public ScriptEngine getEngineFor(UUID p) {
 		ScriptEngine se = engines.get(p);
 		if (se == null) {
+			System.out.println("Creating ScriptEngine for: "+Bukkit.getOfflinePlayer(p).getName());
 			se = factory();
+			engines.put(p, se);
 		}
 		return se;
 	}
@@ -64,19 +63,41 @@ public class Scripting {
 	 * @return 
 	 */
 	private ScriptEngine factory() {
-		NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
-		Set<String> allowed = new HashSet<>();
-		allowed.add("com.tpl");
-		allowed.add("com.tpl.turtles");
-		allowed.add("com.tpl.turtles.TurtleMgr");
-		allowed.add("com.tpl.turtles.TurtleMgr.getInstance");
-		allowed.add("org.bukkit");
-		allowed.add("org.bukkit.block");
-		allowed.add("org.bukkit.block.BlockFace");
+		final String NO_JAVASCRIPT_MESSAGE = "No JavaScript Engine available. ScriptCraft will not work without Javascript.";
 		
+		Thread currentThread = Thread.currentThread();
+		ClassLoader previousClassLoader = currentThread.getContextClassLoader();
+		currentThread.setContextClassLoader(Main.inst.getClsLdr());
+		try {
+//			ScriptEngineManager factory = new ScriptEngineManager();
+//			engine = factory.getEngineByName("JavaScript");
 
-		ScriptEngine engine = factory.getScriptEngine(); //new SandboxClassFilter(allowed)
-		return engine;
+			NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
+			Set<String> allowed = new HashSet<>();
+			allowed.add("com.tpl");
+			allowed.add("com.tpl.turtles");
+			allowed.add("com.tpl.turtles.TurtleMgr");
+			allowed.add("com.tpl.turtles.TurtleMgr.getInstance");
+			allowed.add("org.bukkit");
+			allowed.add("org.bukkit.block");
+			allowed.add("org.bukkit.block.BlockFace");
+
+			ScriptEngine engine = factory.getScriptEngine(); //new SandboxClassFilter(allowed)
+			if (engine == null) {
+				System.out.println(NO_JAVASCRIPT_MESSAGE);
+			} else {
+//				Invocable inv = (Invocable) engine;
+//				this.engine.eval(new InputStreamReader(this.getResource("boot.js")));
+//				inv.invokeFunction("__scboot", this, engine);
+				return engine;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+//			this.getLogger().severe(e.getMessage());
+		} finally {
+			currentThread.setContextClassLoader(previousClassLoader);
+		}
+		return null;
 	}
 //	private static void putJavaVariablesIntoEngine(ScriptEngine engine, List variables) {
 //

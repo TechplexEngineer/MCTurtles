@@ -109,4 +109,12 @@ public class Main extends JavaPlugin {
 			}
 		}
 	}
+
+	/**
+	 * @note I wonder if there was a reason getClassLoader() had protected access
+	 * @return 
+	 */
+	public ClassLoader getClsLdr() {
+		return getClassLoader();
+	}
 }

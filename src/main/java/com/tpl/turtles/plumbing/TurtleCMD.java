@@ -17,7 +17,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
+import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.utils.Book;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 public class TurtleCMD implements CommandExecutor, TabCompleter {
 	
@@ -111,6 +116,38 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			fred.js(code);
 			
 			return true;
+		}
+		
+		if(args[0].equalsIgnoreCase("js")) {
+			if (!(sender instanceof Player)) {
+				sender.sendMessage(ChatColor.RED + "You must be a player!");
+				return false;
+			}
+			if (args.length >= 1) {
+				StringBuilder sb = new StringBuilder();
+				for (int i = 1; i < args.length; i++) {
+					sb.append(args[i]);
+					sb.append(" ");
+				}
+				ScriptEngine eng = Scripting.getInstance().getEngineFor(p.getUniqueId());
+				try {
+					sender.sendMessage("Eval:"+sb.toString());
+					Object res = eng.eval(sb.toString());
+					if (res != null) {
+						sender.sendMessage(res.toString());
+					} else {
+						sender.sendMessage("null");
+					}
+					
+//					System.out.println(str);
+				} catch (ScriptException ex) {
+					ex.printStackTrace();
+				}
+				return true;
+			} else {
+				sender.sendMessage("/t <turtle> js <javascript>");
+				return false;
+			}
 		}
 		
 		String name = args[0];
