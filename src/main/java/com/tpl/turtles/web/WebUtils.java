@@ -8,6 +8,7 @@ package com.tpl.turtles.web;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
@@ -39,11 +40,21 @@ public class WebUtils {
         }
 		return parameters;
     }
+    public static String getEncodedValue(String str, String key) {
+        List <SimpleEntry<String,String>> params = parse(str);
+        for (SimpleEntry<String,String> pair : params) {
+            if (pair.getKey() == key) {
+                return pair.getValue();
+            }
+        }
+        return "";
+    }
 	public static String decode (final String content) {
         try {
             return URLDecoder.decode(content, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
             ex.printStackTrace();
         }
+        return "";
     }
 }

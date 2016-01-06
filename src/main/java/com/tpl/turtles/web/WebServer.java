@@ -20,8 +20,6 @@ import org.apache.commons.io.IOUtils;
 
 import com.tpl.turtles.plumbing.Main;
 import java.net.URLDecoder;
-import org.apache.http.client.utils.URLEncodedUtils;
-
 
 
 /**
@@ -103,8 +101,8 @@ public class WebServer {
 			StringWriter body = new StringWriter();
 			IOUtils.copy(bodyStream, body, "UTF-8");
 			String res1 = body.toString();
-			URLEncodedUtils.parse(res1, "UTF-8");
-			String response = URLDecoder.decode(res1, "UTF-8");
+			String script = WebUtils.getEncodedValue(res1, "script");
+			String response = script; //URLDecoder.decode(res1, "UTF-8");
 			t.sendResponseHeaders(200, response.length());
 			try (OutputStream os = t.getResponseBody()) {
 				os.write(response.getBytes());
