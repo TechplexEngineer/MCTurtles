@@ -23,7 +23,7 @@ public class WebUtils {
 //	public static final String DEFAULT_CONTENT_CHARSET = "ISO-8859-1";
 	
 	public static List <SimpleEntry<String,String>> parse (String str) {
-		List <SimpleEntry<String,String>> parameters = Collections.emptyList();
+		ArrayList <SimpleEntry<String,String>> parameters = new ArrayList<>();
 		Scanner scanner = new Scanner(str);
         scanner.useDelimiter(PARAMETER_SEPARATOR);
         while (scanner.hasNext()) {
@@ -43,7 +43,7 @@ public class WebUtils {
     public static String getEncodedValue(String str, String key) {
         List <SimpleEntry<String,String>> params = parse(str);
         for (SimpleEntry<String,String> pair : params) {
-            if (pair.getKey() == key) {
+            if (pair.getKey().equals(key)) {
                 return pair.getValue();
             }
         }
