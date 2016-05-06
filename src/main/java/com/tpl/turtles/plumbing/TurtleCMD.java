@@ -17,10 +17,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
-import com.tpl.turtles.scripting.Scripting;
-import com.tpl.turtles.utils.Book;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
@@ -72,12 +68,6 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			p = (Player) sender;
 		}
 		
-		if (args[0].equalsIgnoreCase("book")) {
-			
-			Book.give2player(p, DocBook.getDocBook());
-			return true;
-		}
-		
 		if (args[0].equalsIgnoreCase("wand")) {
 			if (!(sender instanceof Player)) {
 				sender.sendMessage(ChatColor.RED + "You must be a player!");
@@ -111,49 +101,6 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			Main.inst.persistTurtles();
 			Main.inst.restoreTurtles();
 			return true;
-		}
-		
-		if (args[0].equalsIgnoreCase("jstest")) {
-			String code = "var tm = com.tpl.turtles.TurtleMgr.getInstance();\n" +
-						"var turtles = tm.getTurtles();\n" +
-						"var turtle = turtles[0];\n" +
-						"turtle.move(org.bukkit.block.BlockFace.North);";
-			Turtle fred = TurtleMgr.getInstance().getByName("fred");
-			fred.js(code);
-			
-			return true;
-		}
-		
-		if(args[0].equalsIgnoreCase("js")) {
-			if (!(sender instanceof Player)) {
-				sender.sendMessage(ChatColor.RED + "You must be a player!");
-				return false;
-			}
-			if (args.length >= 1) {
-				StringBuilder sb = new StringBuilder();
-				for (int i = 1; i < args.length; i++) {
-					sb.append(args[i]);
-					sb.append(" ");
-				}
-				ScriptEngine eng = Scripting.getInstance().getEngineFor(p.getUniqueId());
-				try {
-					sender.sendMessage("Eval:"+sb.toString());
-					Object res = eng.eval(sb.toString());
-					if (res != null) {
-						sender.sendMessage(res.toString());
-					} else {
-						sender.sendMessage("null");
-					}
-					
-//					System.out.println(str);
-				} catch (ScriptException ex) {
-					ex.printStackTrace();
-				}
-				return true;
-			} else {
-				sender.sendMessage("/t <turtle> js <javascript>");
-				return false;
-			}
 		}
 		
 		String name = args[0];
@@ -308,97 +255,11 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			}
 		}
 		
-		if(act.equalsIgnoreCase("js")) {
-			if (args.length >= 3) {
-				StringBuilder sb = new StringBuilder();
-				for (int i = 2; i < args.length; i++) {
-					sb.append(args[i]);
-					sb.append(" ");
-				}
-				t.js(sb.toString());
-				return true;
-			} else {
-				sender.sendMessage("/t <turtle> js <javascript>");
-				return false;
-			}
-		}
-
 		//else send them the usage message
 		sender.sendMessage("/t <turtle> "+CMD_STRING+" ...");
 		
 		return false;
 
-//		if (args[1].equalsIgnoreCase("list")) {
-//			System.out.println(TurtleMgr.getTurtles().size());
-//			for(Turtle tur : TurtleMgr.getTurtles()) {
-//				System.out.println(tur.getName());
-//			}
-//			return false;
-//		}
-//		
-//		if (!(args.length > 1)) {
-//			sender.sendMessage(help);
-//			return false;
-//		}
-//		String name = args[0];
-//		Turtle t = TurtleMgr.getByName(name);
-//		if (t == null) {
-//			sender.sendMessage(ChatColor.RED + "Turtle " + name + " does not exist.");
-//			return false;
-//		}
-//		Player owner = t.getOwner();
-//		if (owner != sender) {
-//			sender.sendMessage(ChatColor.RED + "You don't own that turtle.");
-//			return false;
-//		}
-//		
-//		if (args[1].equalsIgnoreCase("start")) {
-////			if (t.isRunning()) {
-////				sender.sendMessage(ChatColor.RED + "Turtle is already running a script. \"/t " + t.getName()
-////						+ " stop\" to stop it.");
-////				return false;
-////			}
-//			if (args.length != 5) {
-//				sender.sendMessage(help);
-//				return false;
-//			}
-////			t.setScript(Script.getFromConfig(args[3]));
-//			BlockFace bf;
-//			try {
-//				bf = BlockFace.valueOf(args[2].toUpperCase());
-//			} catch (Exception e) {
-//				sender.sendMessage(ChatColor.RED + "Use the names for blockfaces. eg NORTH, EAST, SOUTH or WEST");
-//				return false;
-//			}
-//			if (bf != BlockFace.NORTH && bf != BlockFace.EAST && bf != BlockFace.SOUTH && bf != BlockFace.WEST) {
-//				sender.sendMessage(ChatColor.RED + "You can only use directions; NORTH, EAST, SOUTH or WEST");
-//				return false;
-//			}
-//			t.setDir(bf);
-////			t.start(Integer.parseInt(args[4]));
-//			sender.sendMessage(ChatColor.GREEN + "Started " + t.getName());
-//		} else if (args[1].equalsIgnoreCase("stop")) {
-//			if (owner != sender && !sender.hasPermission("turtles.stop")) {
-//				sender.sendMessage(ChatColor.RED + "You don't own that turtle.");
-//				return false;
-//			}
-////			t.stop();
-//			if (owner != null && t.getOwner() != sender)
-//				owner.sendMessage(ChatColor.RED + ChatColor.BOLD.toString() + sender.getName() + " stopped "
-//						+ t.getName() + "'s current task.");
-//			sender.sendMessage(ChatColor.GREEN + "You stopped " + t.getName() + "'s current task.");
-//		} else if (args[1].equalsIgnoreCase("destroy")) {
-//			if (t.getOwner() == sender || sender.hasPermission("turtles.destroy")) {
-//				t.destroy();
-//				sender.sendMessage(ChatColor.GREEN + "Destroyed turtle " + t.getName());
-//				if (!(t.getOwner() == null))
-//					if (sender != t.getOwner())
-//						t.getOwner().sendMessage(ChatColor.RED + ChatColor.BOLD.toString() + "Your turtle" + t.getName()
-//								+ " was destroyed by " + sender.getName());
-//			} else
-//				sender.sendMessage(ChatColor.RED + "You do not own that turtle.");
-//		}
-//		return false;
 	}
 
 	@Override

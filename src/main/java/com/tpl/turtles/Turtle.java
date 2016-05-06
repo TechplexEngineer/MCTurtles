@@ -30,7 +30,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.OfflinePlayer;
 
 import com.tpl.turtles.plumbing.Main;
-import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.utils.KDebug;
 
 
@@ -765,95 +764,5 @@ public class Turtle implements ConfigurationSerializable {
 		this.loc.getBlock().setType(m);
 		BlockFace f = getFacing();
 		dir(f);
-	}
-	
-	public void js(String js) {
-		ScriptEngine engine = Scripting.getInstance().getEngineFor(owner);
-		
-		try {
-			engine.eval(js);
-		} catch (ScriptException ex) {
-			ex.printStackTrace();
-		}
-	}
-	
-	
-
-//	public void setScript(Script script) {
-//		this.script = script;
-//	}
-
-//	private int task;
-//	private boolean running;
-//	private int timees;
-
-//	public boolean isRunning() {
-//		return running;
-//	}
-//
-//	public boolean start(final int timess) {
-//		if (isRunning())
-//			return false;
-//		running = true;
-//		timees = timess * script.getLength();
-//		mined = 0;
-//		placed = 0;
-//		task = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.inst, new Runnable() {
-//			@Override
-//			public void run() {
-//				if (timees > 0) {
-//					Command cmd = script.getNextCommand();
-//					try {
-//						processCommand(cmd.getLabel(), cmd.getArgs());
-//					} catch (Exception e) {
-//						if (getOwner() != null)
-//							getOwner().sendMessage(ChatColor.RED + "There is an error in: \"" + cmd.getLabel() + " "
-//									+ cmd.getArgs()[0] + "...\"");
-//						else
-//							System.out.println(
-//									"There is an error in: \"" + cmd.getLabel() + " " + cmd.getArgs()[0] + "...\"");
-//					}
-//					timees--;
-//				} else {
-//					running = false;
-//					if (Bukkit.getPlayer(owner) != null)
-//						Bukkit.getPlayer(owner).sendMessage(name + " is done with the script! It mined " + mined
-//								+ " blocks and placed " + placed + " blocks.");
-//					Bukkit.getScheduler().cancelTask(task);
-//				}
-//			}
-//		}, 0, 20);
-//		return true;
-//	}
-
-	
-
-//	public void stop() {
-//		Bukkit.getScheduler().cancelTask(task);
-//		running = false;
-//	}
-
-
-	
-
-	
-
-//	public void processCommand(String label, String[] args) {
-//		if (label.equalsIgnoreCase("move"))
-//			move(Face.valueOf(args[0].toUpperCase()));
-//		else if (label.equalsIgnoreCase("break")) {
-//			if (breakBlock(Face.valueOf(args[0].toUpperCase())))
-//				mined++;
-//		} else if (label.equalsIgnoreCase("place")) {
-//			place(Face.valueOf(args[0].toUpperCase()), getType(args[1]));
-//		} else if (label.equalsIgnoreCase("if")) {
-//			if (check(Face.valueOf(args[0].toUpperCase()), getType(args[1]))) {
-//				String[] argss = new String[args.length - 3];
-//				for (int i = 3; i < args.length; i++)
-//					argss[i - 3] = args[i];
-//				processCommand(args[2], argss);
-//			}
-//		}
-//	}
-	
+	}	
 }
