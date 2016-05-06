@@ -31,6 +31,7 @@ import org.bukkit.OfflinePlayer;
 
 import com.tpl.turtles.plumbing.Main;
 import com.tpl.turtles.utils.KDebug;
+import org.bukkit.entity.Player;
 
 
 public class Turtle implements ConfigurationSerializable {
@@ -404,6 +405,10 @@ public class Turtle implements ConfigurationSerializable {
 	//==========================================================================
     // Utils
     //==========================================================================
+	
+	public boolean isPlayerOwner(Player p) {
+		return p.getUniqueId().toString().equals(getOwner().toString());
+	}
 	
 	/**
 	 * Resolve string {NORTH, EAST, SOUTH, WEST, Up, DOWN, LEFT, RIGHT} to BlockFace

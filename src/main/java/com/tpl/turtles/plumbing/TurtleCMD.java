@@ -110,7 +110,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			return false;
 		}
 
-		if (p != null && t.getOwner() != p.getUniqueId()) {
+		if (p != null && !t.isPlayerOwner(p)) {
 			sender.sendMessage(ChatColor.RED + "You don't own that turtle.");
 			return false;
 		}
@@ -193,7 +193,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			}
 			
 			ItemStack book;
-			if (p.getUniqueId() != t.getOwner()) {
+			if (!t.isPlayerOwner(p)) {
 				sender.sendMessage("Sending non-editable MCTurtles-CommandBook as you are not the owner.");
 				book = new ItemStack(Material.WRITTEN_BOOK);
 			} else {
@@ -279,7 +279,7 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			}
 			for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
 				Player p = (Player)sender;
-				if (p.getUniqueId() != t.getOwner())
+				if (!t.isPlayerOwner(p))
 					continue;
 				String name = t.getName();
 				if (args[0].length() == 0) {

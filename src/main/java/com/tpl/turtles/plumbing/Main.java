@@ -15,6 +15,7 @@ import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
 import io.techplex.borderblocks.State;
 import io.techplex.borderblocks.plumbing.BlockPlayerListener;
+import io.techplex.turtles.web.WebApi;
 import org.bukkit.Location;
 
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -47,14 +48,12 @@ public class Main extends JavaPlugin {
 
 		restoreTurtles();
 		
-//		WebServer.getInstance().start();
-		
 		pm.registerEvents(new BlockPlayerListener(), this);
         Location loc1 = new Location(getServer().getWorld("world"), -8, 62, -65);
         Location loc2 = new Location(getServer().getWorld("world"), -4, 62, -69);
         State.getInstance().addRestrictedArea(loc1, loc2);
 		
-//		WebApi.getInstance().start();
+		WebApi.getInstance().start();
 	}
 
 	/**
@@ -63,7 +62,7 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		persistTurtles();
-//		WebServer.getInstance().stop();
+		WebApi.getInstance().start();
 		TurtleMgr.getInstance().cleanup();
 	}
 	

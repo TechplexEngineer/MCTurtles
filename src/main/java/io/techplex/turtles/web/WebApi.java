@@ -5,6 +5,7 @@
  */
 package io.techplex.turtles.web;
 
+import com.tpl.turtles.plumbing.Main;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -54,6 +55,11 @@ public class WebApi {
 		} catch(IOException ex) {
 			ex.printStackTrace();
 		}
+		ProcessApiQueueTask processor = new ProcessApiQueueTask();
+		
+		long delay = 20; //ticks to wait before scheduling (usually 20 ticks /sec)
+		long period = 20; //ticks to wait between runs
+//		processor.runTaskTimer(Main.getInstance(), delay, period);
 		
 //		if (apiserver == null) {
 //			apiserver = new Server();
