@@ -52,6 +52,12 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
+        if (args.length == 0) {
+            //@todo print usage
+            sender.sendMessage("You've found the Turtle Command");
+            sender.sendMessage("try /t list for a list of turtles");
+            return true;
+        }
 		
 		if (args[0].equalsIgnoreCase("list")) {
 			sender.sendMessage("There are "+TurtleMgr.getInstance().getTurtles().size()+" turtles:");

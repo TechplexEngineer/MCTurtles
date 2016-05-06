@@ -14,7 +14,6 @@ import org.bukkit.Material;
 
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
-import com.tpl.turtles.utils.SignGUI;
 
 public class PlayerListener implements Listener {
 	
@@ -79,26 +78,28 @@ public class PlayerListener implements Listener {
 	 */
 	public void createTurtle(Player player, final Location l) {
 		//get the name of the turtle from the user
-		SignGUI gui = new SignGUI(Main.inst);
-		gui.open(player, new String[]{"", "Enter a turtle", "name on the first", "line of this sign."}, new SignGUI.SignGUIListener() {
-			@Override
-			public void onSignDone(Player player, String[] lines) {
-				String name = lines[0];
-				if (name.length() == 0) {
-					player.sendMessage(ChatColor.RED + "Please enter a valid name.");
-					return;
-				}
-				System.out.println("Creating new turtle named:"+name);
-				Turtle t = TurtleMgr.getInstance().getByName(name);
-				if (t == null) {
-					//@todo Get direction
-					t = TurtleMgr.getInstance().getNewTurtle(name, l, player.getUniqueId());
-					player.sendMessage(ChatColor.GREEN + "Created turtle: " + t.getName());
-				} else {
-					player.sendMessage(ChatColor.RED + "A turtle with that name already exists.");
-				}
-			}
-
-		});
+//		String name = lines[0];
+//        if (name.length() == 0) {
+//            player.sendMessage(ChatColor.RED + "Please enter a valid name.");
+//            return;
+//        }
+        String turtleName = "Turtle"+TurtleMgr.getInstance().getNumTurtles();
+        System.out.println("Creating new turtle named:"+turtleName);
+        Turtle t = TurtleMgr.getInstance().getByName(turtleName);
+        while(t!= null) {
+            turtleName += "_";
+        }
+        if (t == null) {
+            //@todo Get direction
+            t = TurtleMgr.getInstance().getNewTurtle(turtleName, l, player.getUniqueId());
+            player.sendMessage(ChatColor.GREEN + "Created turtle: " + t.getName());
+            player.sendMessage(ChatColor.GOLD + "Go to the turtle manager with your web browser to rename and control your Turtle: http://plexon.local:8000/newturtle/"+turtleName);
+            
+            //@note this is slightly insecure as there is no check to ensure that the person who created the turtle is the one opening the web interface.
+            //We could generate a random key and add that to the URL but for now thats overkill
+        } else {
+            //This should NEVER happen!
+            player.sendMessage(ChatColor.RED + "A turtle with that name already exists.");
+        }
 	}
 }

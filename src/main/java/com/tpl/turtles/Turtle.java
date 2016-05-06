@@ -52,7 +52,7 @@ public class Turtle implements ConfigurationSerializable {
 	private BlinkTask blinkTask = null;
 	
 	public static final Material TURTLE_BLINK_MATERIAL = Material.GLOWSTONE;
-	public static final Material TURTLE_MATERIAL = Material.DISPENSER; //@note use a directioal block
+	public static final Material TURTLE_MATERIAL = Material.DISPENSER; //@note use a directioal block Material.DISPENSER
 	public static final Material TURTLEWAND_MATERIAL = Material.BLAZE_ROD;
 	
 	//@note continued (directional blocks): Banner, Bed, Button, Chest, CocoaPlant, Diode, DirectionalContainer, Dispenser, Door, EnderChest, Furnace, FurnaceAndDispenser, Gate, Ladder, Lever, PistonBaseMaterial, PistonExtensionMaterial, Pumpkin, RedstoneTorch, Sign, SimpleAttachableMaterialData, Skull, Stairs, Torch, TrapDoor, TripwireHook

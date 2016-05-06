@@ -48,6 +48,14 @@ public class TurtleMgr  {
 	public List<Turtle> getTurtles() {
 		return TURTLES;
 	}
+    
+    /**
+     * Get the number of Turtles managed by this TurtleMgr
+     * @return Count of turtles on the server
+     */
+    public int getNumTurtles() {
+        return TURTLES.size();
+    }
 	
 	/**
 	 * Add a turtle to the list
