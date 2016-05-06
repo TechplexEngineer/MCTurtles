@@ -13,8 +13,8 @@ public class ReloadCMD implements CommandExecutor {
 			sender.sendMessage(ChatColor.RED + "You don't have permission.");
 			return false;
 		}
-		Main.inst.reloadConfig();
-		Main.inst.config = Main.inst.getConfig();
+		Main.getInstance().reloadConfig();
+		Main.getInstance().config = Main.getInstance().getConfig();
 		sender.sendMessage(ChatColor.GREEN + "Reloaded the scripts!");
 		return true;
 	}

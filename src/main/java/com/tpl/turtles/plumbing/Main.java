@@ -13,7 +13,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
-import com.tpl.turtles.web.WebServer;
 import io.techplex.borderblocks.State;
 import io.techplex.borderblocks.plumbing.BlockPlayerListener;
 import org.bukkit.Location;
@@ -22,8 +21,16 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
 public class Main extends JavaPlugin {
 
-	public static Main inst;
+	private static Main inst;
 	public FileConfiguration config;
+	
+	public static Main getInstance() {
+		if (inst != null) {
+			return inst;
+		}
+		//This should never happen because to call Main.getInstance the plugin has to have been initialized.
+		throw new NullPointerException("Plugin not yet Initialized!");
+	}
 	
 	@Override
 	public void onEnable() {
@@ -40,7 +47,7 @@ public class Main extends JavaPlugin {
 
 		restoreTurtles();
 		
-		WebServer.getInstance().start();
+//		WebServer.getInstance().start();
 		
 		pm.registerEvents(new BlockPlayerListener(), this);
         Location loc1 = new Location(getServer().getWorld("world"), -8, 62, -65);
@@ -56,7 +63,7 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		persistTurtles();
-		WebServer.getInstance().stop();
+//		WebServer.getInstance().stop();
 		TurtleMgr.getInstance().cleanup();
 	}
 	

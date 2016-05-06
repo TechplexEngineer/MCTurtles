@@ -722,7 +722,7 @@ public class Turtle implements ConfigurationSerializable {
 
 		if (blinkTask == null) {
 			blinkTask = new BlinkTask();
-			blinkTask.runTaskTimer(Main.inst, delay, period);
+			blinkTask.runTaskTimer(Main.getInstance(), delay, period);
 		} else {
 			blinkTask.cancel();
 			blinkTask = null;
