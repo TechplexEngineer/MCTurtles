@@ -6,10 +6,18 @@
 package io.techplex.turtles.web;
 
 import com.tpl.turtles.plumbing.Main;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.simpleframework.http.core.Container;
@@ -26,7 +34,8 @@ public class WebApi {
 	private static WebApi inst = null;
 	private Connection connection;
 	
-	ConcurrentLinkedQueue<ApiAction> queue = new ConcurrentLinkedQueue<>();
+	//A queue of actions to be processed on the main server thread. ex: turtle0 move forward
+	private ConcurrentLinkedQueue<ApiAction> queue = new ConcurrentLinkedQueue<>();
 
 	
 	public static WebApi getInstance() {
@@ -39,11 +48,16 @@ public class WebApi {
 	public ApiAction getNextApiAction() {
 		return queue.poll();
 	}
+	public void addApiAction(ApiAction act) {
+		queue.add(act);
+	}
 	
 	/**
 	 * Start the HTTP server thread
 	 */
 	public void start() {
+		
+		extractResources("web", Main.getInstance().getDataFolder());
 		
 		try {
 			Container container = new ApiContainer();
@@ -59,37 +73,8 @@ public class WebApi {
 		
 		long delay = 20; //ticks to wait before scheduling (usually 20 ticks /sec)
 		long period = 20; //ticks to wait between runs
-//		processor.runTaskTimer(Main.getInstance(), delay, period);
-		
-//		if (apiserver == null) {
-//			apiserver = new Server();
-//			apiserver.GET("/", (req, res) -> {
-//				res.respondText("Hello world");
-//				
-//			})
-//			.GET("/hello/:name", (req, res) -> {
-//				String name = req.param("name");
-//				queue.add(new ApiAction(name));
-//				res.respondText("Hello " + name);
-//			})
-//			.GET("/turtle/:name/:action/:direction", (req, res) -> {
-//				String name = req.param("name");
-//				String action = req.param("action");
-//				String direction = req.param("direction");
-////				String name = req.param("name"); /:count
-//				
-//				queue.add(new ApiAction(name));
-//				res.respondText("Hello " + name);
-//			})
-//			.POST("/t/:command", (req, res) -> {
-//				Main.getInstance().getLogger().warning(req.param("command"));
-//			})
-//			.start(8000);
-//			
-//		} 
-//		else {
-//			Main.getInstance().getLogger().warning("apiserver already started");
-//		}
+		processor.runTaskTimer(Main.getInstance(), delay, period);
+
 	}
 	public void stop() {
 		try {
@@ -97,6 +82,45 @@ public class WebApi {
 		} catch (IOException ex) {
 			Logger.getLogger(WebApi.class.getName()).log(Level.SEVERE, null, ex);
 //			Main.getInstance().getLogger().warning("apiserver already started");
+		}
+	}
+	/**
+	 * Extract the files with the prefix 'path' to 'out' Used to extract the
+	 * web/ files to the plugin data directory Based on code from
+	 * http://stackoverflow.com/questions/11012819/how-can-i-get-a-resource-folder-from-inside-my-jar-file
+	 *
+	 * @param path where to extract the files from
+	 * @param out where to extract the files to
+	 */
+	private void extractResources(String path, File out) {
+
+		final File jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+
+		if (jarFile.isFile()) {
+			// Run with JAR file
+			try (JarFile jar = new JarFile(jarFile)) {
+
+				final Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+				while (entries.hasMoreElements()) {
+
+					JarEntry entry = entries.nextElement();
+					String name = entry.getName();
+					if (name.startsWith(path + "/")) { //filter according to the path
+						System.out.println(name);
+						File file = new File(out + File.separator + name);
+						if (entry.isDirectory()) {
+							file.mkdirs();
+						} else {
+							try (InputStream input = jar.getInputStream(entry)) {
+								Files.copy(input, Paths.get(file.getPath()), StandardCopyOption.REPLACE_EXISTING);
+							}
+						}
+
+					}
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 	

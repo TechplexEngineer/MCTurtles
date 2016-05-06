@@ -62,7 +62,7 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		persistTurtles();
-		WebApi.getInstance().start();
+		WebApi.getInstance().stop();
 		TurtleMgr.getInstance().cleanup();
 	}
 	

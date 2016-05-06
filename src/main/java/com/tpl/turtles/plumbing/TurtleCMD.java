@@ -17,8 +17,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 public class TurtleCMD implements CommandExecutor, TabCompleter {
 	
