@@ -252,6 +252,9 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 				return false;
 			}
 		}
+		if (act.equalsIgnoreCase("penDown")) {
+			t.setPenDown(args[2]);
+		}
 		
 		//else send them the usage message
 		sender.sendMessage("/t <turtle> "+CMD_STRING+" ...");

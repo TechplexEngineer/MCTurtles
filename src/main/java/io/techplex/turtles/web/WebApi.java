@@ -48,6 +48,13 @@ public class WebApi {
 	public ApiAction getNextApiAction() {
 		return queue.poll();
 	}
+	
+	/**
+	 * Add an ApiAction to the queue to be processed by the runnable on the main thread.
+	 * We have to do this because the Bukkit/Spigot API's are not threadsafe, changes
+	 * to the world can only be made on the main server thread.
+	 * @param act 
+	 */
 	public void addApiAction(ApiAction act) {
 		queue.add(act);
 	}

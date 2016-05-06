@@ -1,6 +1,7 @@
 package com.tpl.turtles;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +16,7 @@ public class TurtleMgr  {
 	private static TurtleMgr inst = null;
 	private List<Turtle> TURTLES;
 	protected TurtleMgr () {
-		TURTLES = new ArrayList<>();
+		TURTLES = Collections.synchronizedList(new ArrayList<>());
 	}
 	public static TurtleMgr getInstance() {
       if(inst == null) {
@@ -116,7 +117,7 @@ public class TurtleMgr  {
 	 */
 	public Turtle getByName(String name) {
 		for (Turtle t : TURTLES)
-			if (t.getName().equals(name)) {
+			if (t.getName().equalsIgnoreCase(name)) {
 				return t;
 			}
 		return null;

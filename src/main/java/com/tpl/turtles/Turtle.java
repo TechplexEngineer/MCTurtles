@@ -353,6 +353,10 @@ public class Turtle implements ConfigurationSerializable {
 		penDown = m;
 	}
 	
+	public void setPenDown(String mat) {
+		penDown =  Material.getMaterial(mat.toUpperCase());;
+	}
+	
 	/**
 	 * Make the turtle stop placing blocks when it moves
 	 */

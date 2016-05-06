@@ -9,6 +9,7 @@ package io.techplex.turtles.web;
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
 import com.tpl.turtles.plumbing.Main;
+import java.util.Optional;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -40,7 +41,8 @@ public class ProcessApiQueueTask extends BukkitRunnable {
 				mat = args[3];
 			}
 			
-			if (act.equalsIgnoreCase("move"))if (act.equalsIgnoreCase("delete")) {
+		
+			if (act.equalsIgnoreCase("delete")) {
 				t.destroy(true);
 
 			}
@@ -56,6 +58,20 @@ public class ProcessApiQueueTask extends BukkitRunnable {
 			if (act.equalsIgnoreCase("move")) {
 				if (args.length == 3) {
 					t.move(dir);
+				} else if (args.length == 4) {
+					Optional<Integer> amount = Optional.empty();
+
+					try {
+						amount = Optional.of(Integer.parseInt(args[3]));
+					} catch(NumberFormatException e) {
+						e.printStackTrace();
+					}
+					if (amount.isPresent()) {
+						int num = amount.get();
+						for(int i=0; i<num; i++) {
+							t.move(dir);
+						}
+					}
 				}
 			}
 
