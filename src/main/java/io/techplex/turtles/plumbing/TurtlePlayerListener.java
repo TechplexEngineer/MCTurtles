@@ -1,4 +1,7 @@
-package com.tpl.turtles.plumbing;
+package io.techplex.turtles.plumbing;
+
+import io.techplex.turtles.Turtle;
+import io.techplex.turtles.TurtleMgr;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
@@ -12,10 +15,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import com.tpl.turtles.Turtle;
-import com.tpl.turtles.TurtleMgr;
 
-public class PlayerListener implements Listener {
+
+public class TurtlePlayerListener implements Listener {
 	
 
 	/**

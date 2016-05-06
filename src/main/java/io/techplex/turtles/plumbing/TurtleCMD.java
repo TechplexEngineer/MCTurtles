@@ -1,7 +1,14 @@
-package com.tpl.turtles.plumbing;
+package io.techplex.turtles.plumbing;
+
+import io.techplex.turtles.Turtle;
+import io.techplex.turtles.TurtleMgr;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.lang.StringUtils;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -9,20 +16,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import com.tpl.turtles.Turtle;
-import com.tpl.turtles.TurtleMgr;
-import com.tpl.turtles.scripting.Scripting;
-import com.tpl.turtles.utils.Book;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 public class TurtleCMD implements CommandExecutor, TabCompleter {
 	
@@ -61,8 +58,8 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		
 		if (args[0].equalsIgnoreCase("list")) {
 			sender.sendMessage("There are "+TurtleMgr.getInstance().getTurtles().size()+" turtles:");
-			for (Turtle tur : TurtleMgr.getInstance().getTurtles()) {
-				sender.sendMessage(tur.getName());
+			for (Map.Entry<String, Turtle> t : TurtleMgr.getInstance().getTurtles().entrySet()) {
+				sender.sendMessage(t.getValue().getName());
 			}
 			return true;
 		}
@@ -72,11 +69,11 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			p = (Player) sender;
 		}
 		
-		if (args[0].equalsIgnoreCase("book")) {
-			
-			Book.give2player(p, DocBook.getDocBook());
-			return true;
-		}
+//		if (args[0].equalsIgnoreCase("book")) {
+//			
+//			Book.give2player(p, DocBook.getDocBook());
+//			return true;
+//		}
 		
 		if (args[0].equalsIgnoreCase("wand")) {
 			if (!(sender instanceof Player)) {
@@ -96,65 +93,65 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		}
 		
 		if (args[0].equalsIgnoreCase("persist")) {
-			Main.inst.persistTurtles();
+			TurtleMgr.getInstance().persistTurtles();
 			sender.sendMessage("Persisting turtles");
 			return true;
 		}
 		
 		if (args[0].equalsIgnoreCase("restore")) {
-			int num = Main.inst.restoreTurtles();
+			int num = TurtleMgr.getInstance().restoreTurtles();
 			sender.sendMessage("Restored "+num+" turtles");
 			return true;
 		}
 		
 		if (args[0].equalsIgnoreCase("reload")) {
-			Main.inst.persistTurtles();
-			Main.inst.restoreTurtles();
+			TurtleMgr.getInstance().persistTurtles();
+			TurtleMgr.getInstance().restoreTurtles();
 			return true;
 		}
 		
-		if (args[0].equalsIgnoreCase("jstest")) {
-			String code = "var tm = com.tpl.turtles.TurtleMgr.getInstance();\n" +
-						"var turtles = tm.getTurtles();\n" +
-						"var turtle = turtles[0];\n" +
-						"turtle.move(org.bukkit.block.BlockFace.North);";
-			Turtle fred = TurtleMgr.getInstance().getByName("fred");
-			fred.js(code);
-			
-			return true;
-		}
+//		if (args[0].equalsIgnoreCase("jstest")) {
+//			String code = "var tm = com.tpl.turtles.TurtleMgr.getInstance();\n" +
+//						"var turtles = tm.getTurtles();\n" +
+//						"var turtle = turtles[0];\n" +
+//						"turtle.move(org.bukkit.block.BlockFace.North);";
+//			Turtle fred = TurtleMgr.getInstance().getByName("fred");
+//			fred.js(code);
+//			
+//			return true;
+//		}
 		
-		if(args[0].equalsIgnoreCase("js")) {
-			if (!(sender instanceof Player)) {
-				sender.sendMessage(ChatColor.RED + "You must be a player!");
-				return false;
-			}
-			if (args.length >= 1) {
-				StringBuilder sb = new StringBuilder();
-				for (int i = 1; i < args.length; i++) {
-					sb.append(args[i]);
-					sb.append(" ");
-				}
-				ScriptEngine eng = Scripting.getInstance().getEngineFor(p.getUniqueId());
-				try {
-					sender.sendMessage("Eval:"+sb.toString());
-					Object res = eng.eval(sb.toString());
-					if (res != null) {
-						sender.sendMessage(res.toString());
-					} else {
-						sender.sendMessage("null");
-					}
-					
-//					System.out.println(str);
-				} catch (ScriptException ex) {
-					ex.printStackTrace();
-				}
-				return true;
-			} else {
-				sender.sendMessage("/t <turtle> js <javascript>");
-				return false;
-			}
-		}
+//		if(args[0].equalsIgnoreCase("js")) {
+//			if (!(sender instanceof Player)) {
+//				sender.sendMessage(ChatColor.RED + "You must be a player!");
+//				return false;
+//			}
+//			if (args.length >= 1) {
+//				StringBuilder sb = new StringBuilder();
+//				for (int i = 1; i < args.length; i++) {
+//					sb.append(args[i]);
+//					sb.append(" ");
+//				}
+//				ScriptEngine eng = Scripting.getInstance().getEngineFor(p.getUniqueId());
+//				try {
+//					sender.sendMessage("Eval:"+sb.toString());
+//					Object res = eng.eval(sb.toString());
+//					if (res != null) {
+//						sender.sendMessage(res.toString());
+//					} else {
+//						sender.sendMessage("null");
+//					}
+//					
+////					System.out.println(str);
+//				} catch (ScriptException ex) {
+//					ex.printStackTrace();
+//				}
+//				return true;
+//			} else {
+//				sender.sendMessage("/t <turtle> js <javascript>");
+//				return false;
+//			}
+//		}
 		
 		String name = args[0];
 		Turtle t = TurtleMgr.getInstance().getByName(name);
@@ -308,20 +305,20 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			}
 		}
 		
-		if(act.equalsIgnoreCase("js")) {
-			if (args.length >= 3) {
-				StringBuilder sb = new StringBuilder();
-				for (int i = 2; i < args.length; i++) {
-					sb.append(args[i]);
-					sb.append(" ");
-				}
-				t.js(sb.toString());
-				return true;
-			} else {
-				sender.sendMessage("/t <turtle> js <javascript>");
-				return false;
-			}
-		}
+//		if(act.equalsIgnoreCase("js")) {
+//			if (args.length >= 3) {
+//				StringBuilder sb = new StringBuilder();
+//				for (int i = 2; i < args.length; i++) {
+//					sb.append(args[i]);
+//					sb.append(" ");
+//				}
+//				t.js(sb.toString());
+//				return true;
+//			} else {
+//				sender.sendMessage("/t <turtle> js <javascript>");
+//				return false;
+//			}
+//		}
 
 		//else send them the usage message
 		sender.sendMessage("/t <turtle> "+CMD_STRING+" ...");
@@ -416,11 +413,11 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			if ("wand".startsWith(args[0].toLowerCase())) {
 				possibles.add("wand");
 			}
-			for (Turtle t : TurtleMgr.getInstance().getTurtles()) {
+			for (Map.Entry<String, Turtle> t : TurtleMgr.getInstance().getTurtles().entrySet()) {
 				Player p = (Player)sender;
-				if (p.getUniqueId() != t.getOwner())
+				if (p.getUniqueId() != t.getValue().getOwner())
 					continue;
-				String name = t.getName();
+				String name = t.getValue().getName();
 				if (args[0].length() == 0) {
 					possibles.add(name);
 					continue;
