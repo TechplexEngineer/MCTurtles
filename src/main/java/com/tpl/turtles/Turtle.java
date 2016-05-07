@@ -30,6 +30,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.OfflinePlayer;
 
 import com.tpl.turtles.plumbing.Main;
+import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.utils.KDebug;
 import org.bukkit.entity.Player;
 
@@ -773,5 +774,15 @@ public class Turtle implements ConfigurationSerializable {
 		this.loc.getBlock().setType(m);
 		BlockFace f = getFacing();
 		dir(f);
-	}	
+	}
+	
+	public void js(String js) {
+		ScriptEngine engine = Scripting.getInstance().getEngineFor(owner);
+		
+		try {
+			engine.eval(js);
+		} catch (ScriptException ex) {
+			ex.printStackTrace();
+		}
+	}
 }

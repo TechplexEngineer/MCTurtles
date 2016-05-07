@@ -23,73 +23,87 @@ public class ProcessApiQueueTask extends BukkitRunnable {
 		ApiAction action = WebApi.getInstance().getNextApiAction();
 		if (action != null) {
 			Main.getInstance().getLogger().warning("--------Runnable: "+action.getAction());
-			String[] args = action.getAction().split(" ");
-			Turtle t = TurtleMgr.getInstance().getByName(args[0]);
 			
-			String act = "";
-			if (args.length >= 2) {
-				act = args[1];
-			}
-
-			String dir = "";
-			if (args.length >= 3) {
-				dir = args[2];
-			}
-
-			String mat = "";
-			if (args.length >= 4) {
-				mat = args[3];
+			if (action.getType() == ApiAction.ApiActionType.js) 
+			{
+				if (!action.getTurtleName().isPresent()) {
+					Main.getInstance().getLogger().warning("--------ERROR: No turtle name in JS api action");
+					return;
+				}
+				Turtle t = TurtleMgr.getInstance().getByName(action.getTurtleName().get());
+				t.js(action.getAction());
 			}
 			
-		
-			if (act.equalsIgnoreCase("delete")) {
-				t.destroy(true);
+			if (action.getType() == ApiAction.ApiActionType.txtcmd)
+			{
+				String[] args = action.getAction().split(" ");
+				Turtle t = TurtleMgr.getInstance().getByName(args[0]);
 
-			}
+				String act = "";
+				if (args.length >= 2) {
+					act = args[1];
+				}
 
-			if (act.equalsIgnoreCase("fw") || act.equalsIgnoreCase("firework")) {
-				t.makeFirework();
-			}
+				String dir = "";
+				if (args.length >= 3) {
+					dir = args[2];
+				}
 
-			if (act.equalsIgnoreCase("blink")) {
-				t.toggleBlink();
-			}
+				String mat = "";
+				if (args.length >= 4) {
+					mat = args[3];
+				}
 
-			if (act.equalsIgnoreCase("move")) {
-				if (args.length == 3) {
-					t.move(dir);
-				} else if (args.length == 4) {
-					Optional<Integer> amount = Optional.empty();
 
-					try {
-						amount = Optional.of(Integer.parseInt(args[3]));
-					} catch(NumberFormatException e) {
-						e.printStackTrace();
-					}
-					if (amount.isPresent()) {
-						int num = amount.get();
-						for(int i=0; i<num; i++) {
-							t.move(dir);
+				if (act.equalsIgnoreCase("delete")) {
+					t.destroy(true);
+
+				}
+
+				if (act.equalsIgnoreCase("fw") || act.equalsIgnoreCase("firework")) {
+					t.makeFirework();
+				}
+
+				if (act.equalsIgnoreCase("blink")) {
+					t.toggleBlink();
+				}
+
+				if (act.equalsIgnoreCase("move")) {
+					if (args.length == 3) {
+						t.move(dir);
+					} else if (args.length == 4) {
+						Optional<Integer> amount = Optional.empty();
+
+						try {
+							amount = Optional.of(Integer.parseInt(args[3]));
+						} catch(NumberFormatException e) {
+							e.printStackTrace();
+						}
+						if (amount.isPresent()) {
+							int num = amount.get();
+							for(int i=0; i<num; i++) {
+								t.move(dir);
+							}
 						}
 					}
 				}
-			}
 
-			if (act.equalsIgnoreCase("rotate")) {
-				if (args.length == 3) {
-					t.rotate(dir);
+				if (act.equalsIgnoreCase("rotate")) {
+					if (args.length == 3) {
+						t.rotate(dir);
+					}
 				}
-			}
 
-			if (act.equalsIgnoreCase("mine")) {
-				if (args.length == 3) {
-					t.mine(dir);
+				if (act.equalsIgnoreCase("mine")) {
+					if (args.length == 3) {
+						t.mine(dir);
+					}
 				}
-			}
 
-			if (act.equalsIgnoreCase("place")) {
-				if (args.length == 4) {
-					t.place(dir, mat);
+				if (act.equalsIgnoreCase("place")) {
+					if (args.length == 4) {
+						t.place(dir, mat);
+					}
 				}
 			}
 			

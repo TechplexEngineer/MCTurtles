@@ -5,6 +5,7 @@
  */
 package io.techplex.turtles.web;
 
+import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
@@ -49,7 +50,17 @@ public class ApiContainer implements Container {
 				body.println("Success: "+successCount);
 				body.println("Failure: "+failCount);
 				
-			} else {
+			} else if(req.getPath().toString().equals("/js/Turtle0") && req.getMethod().equals("POST")) {
+				String code = req.getContent();
+				String turtleName = "Turtle0";
+				
+				body.println("Code Exec");
+				WebApi.getInstance().addApiAction(new ApiAction(code, turtleName));
+				
+				
+				
+			}
+			else {
 				body.println("Hello World");
 				body.println(req.getPath());
 				body.println(req.getMethod());

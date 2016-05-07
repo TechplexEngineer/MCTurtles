@@ -181,58 +181,6 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 			}
 		}
 		
-		if(act.equalsIgnoreCase("book")) {
-			//@todo cleanup or remove
-			//Editing code in books is very much less than idea as one can't move
-			//theire cursor around.
-			if (!(sender instanceof Player)) {
-				sender.sendMessage(ChatColor.RED + "You must be a player!");
-				return false;
-			}
-			
-			ItemStack book;
-			if (!t.isPlayerOwner(p)) {
-				sender.sendMessage("Sending non-editable MCTurtles-CommandBook as you are not the owner.");
-				book = new ItemStack(Material.WRITTEN_BOOK);
-			} else {
-				book = new ItemStack(Material.BOOK_AND_QUILL);
-			}
-			
-			BookMeta bookMeta = (BookMeta) book.getItemMeta();
-			
-			//get the pages
-			ArrayList<String> pages = new ArrayList<>();
-			//bookMeta.getPages().go;
-
-			//add the page to the list of pages
-			StringBuilder page = new StringBuilder();
-			page.append("Welcome to MCTurtles. \n");
-			page.append("This book contains the command script for '").append(t.getName()).append("' the turtle.");
-			page.append("Turtles understand the following commands: \n");
-			page.append("move {").append(DIR_STRING).append("} [num_spaces] \n");
-			page.append("delete \n");
-			page.append("rotate {").append(DIR_STRING).append("}\n");
-			page.append("place {").append(DIR_STRING).append("} <material>\n");
-			page.append("penDown <material>\n");
-			page.append("penUp \n");
-			page.append("items in square brackets are optional[...] \n");
-			page.append("items in curly braces {a|b} pick one\n");
-			pages.add(page.toString());
-			
-			bookMeta.setPages(pages);
-
-			//set the title and author of this book
-			bookMeta.setTitle("Interactive Book");
-			bookMeta.setAuthor(t.getName()+" Commands");
-
-			//update the ItemStack with this new meta
-			book.setItemMeta(bookMeta);
-
-			p.getInventory().addItem(book);
-
-			return true;
-		}
-		
 		if(act.equalsIgnoreCase("bookmark")) {
 			if (args.length == 3) {
 				t.bookmark(dir);
