@@ -1,6 +1,8 @@
 package com.tpl.turtles.scripting;
 
 import com.tpl.turtles.plumbing.Main;
+import java.io.File;
+import java.io.FileReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -80,13 +82,17 @@ public class Scripting {
 			allowed.add("com.tpl.turtles.TurtleMgr.getInstance");
 //stop
 
-			ScriptEngine engine = factory.getScriptEngine(new SandboxClassFilter(allowed));
+			ScriptEngine engine = factory.getScriptEngine(); //new SandboxClassFilter(allowed)
 			if (engine == null) {
 				System.out.println(NO_JAVASCRIPT_MESSAGE);
 			} else {
-//				Invocable inv = (Invocable) engine;
-//				this.engine.eval(new InputStreamReader(this.getResource("boot.js")));
-//				inv.invokeFunction("__scboot", this, engine);
+				Main.getInstance().getLogger().info("Eval Acorn");
+				engine.eval(new FileReader(new File(Main.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "acorn.js")));
+				Main.getInstance().getLogger().info("Eval Interp");
+				engine.eval(new FileReader(new File(Main.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "interpreter.js")));
+//				Main.getInstance().getLogger().info("Eval TurtleInit");
+//				engine.eval(new FileReader(new File(Main.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "turtleinit.js")));
+				Main.getInstance().getLogger().info("Eval Done");
 				return engine;
 			}
 		} catch (Exception e) {

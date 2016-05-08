@@ -33,6 +33,7 @@ import com.tpl.turtles.plumbing.Main;
 import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.utils.KDebug;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 
 public class Turtle implements ConfigurationSerializable {
@@ -776,13 +777,11 @@ public class Turtle implements ConfigurationSerializable {
 		dir(f);
 	}
 	
-	public void js(String js) {
+	public void js(String jscode) {
 		ScriptEngine engine = Scripting.getInstance().getEngineFor(owner);
+		long delay = 20;
+		long period = 10; //ticks. 20 ticks in one second
+		new TurtleCodeRunner(engine, jscode);
 		
-		try {
-			engine.eval(js);
-		} catch (ScriptException ex) {
-			ex.printStackTrace();
-		}
 	}
 }

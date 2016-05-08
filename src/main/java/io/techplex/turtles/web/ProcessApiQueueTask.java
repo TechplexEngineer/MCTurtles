@@ -23,8 +23,8 @@ public class ProcessApiQueueTask extends BukkitRunnable {
 		ApiAction action = WebApi.getInstance().getNextApiAction();
 		if (action != null) {
 			Main.getInstance().getLogger().warning("--------Runnable: "+action.getAction());
-			
-			if (action.getType() == ApiAction.ApiActionType.js) 
+
+			if (action.getType() == ApiAction.ApiActionType.js)
 			{
 				if (!action.getTurtleName().isPresent()) {
 					Main.getInstance().getLogger().warning("--------ERROR: No turtle name in JS api action");
@@ -33,7 +33,7 @@ public class ProcessApiQueueTask extends BukkitRunnable {
 				Turtle t = TurtleMgr.getInstance().getByName(action.getTurtleName().get());
 				t.js(action.getAction());
 			}
-			
+
 			if (action.getType() == ApiAction.ApiActionType.txtcmd)
 			{
 				String[] args = action.getAction().split(" ");

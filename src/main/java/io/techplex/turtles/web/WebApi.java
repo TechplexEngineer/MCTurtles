@@ -64,7 +64,11 @@ public class WebApi {
 	 */
 	public void start() {
 		
-		extractResources("web", Main.getInstance().getDataFolder());
+		if (!Files.exists(new File(Main.getInstance().getDataFolder() + File.separator + "web").toPath()))
+			extractResources("web", Main.getInstance().getDataFolder());
+
+		if (!Files.exists(new File(Main.getInstance().getDataFolder() + File.separator + "javascript").toPath()))
+			extractResources("javascript", Main.getInstance().getDataFolder());
 		
 		try {
 			Container container = new ApiContainer();
