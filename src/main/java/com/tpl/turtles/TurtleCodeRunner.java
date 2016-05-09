@@ -20,10 +20,12 @@ import org.bukkit.scheduler.BukkitRunnable;
  *
  * @author techplex
  */
-public class TurtleCodeRunner extends BukkitRunnable {
+public class TurtleCodeRunner {
 	
 	private final ScriptEngine engine;
 	private final String code;
+	private long delay = 10;//ticks. 20 ticks in one second
+
 	public TurtleCodeRunner(ScriptEngine engine, String code) {
 		this.engine = engine;
 		this.code = code;
@@ -38,7 +40,6 @@ public class TurtleCodeRunner extends BukkitRunnable {
 			engine.eval("var myCode = '"+code+"';\n");
 		
 			engine.eval("var myInterpreter = new Interpreter(myCode, initFunc);"); // This has the nasty side effect that only one turtle per person can be operating at a time.
-//			engine.eval("myInterpreter.step()");
 		} catch (ScriptException ex) {
 			Main.getInstance().getLogger().log(Level.SEVERE, "Turtle Code Runner Constructor", ex);
 			return;
@@ -46,30 +47,33 @@ public class TurtleCodeRunner extends BukkitRunnable {
 			Main.getInstance().getLogger().log(Level.SEVERE, "File not Found", ex);
 			return;
 		}
-		long delay = 0;
-		long period = 20; //ticks. 20 ticks in one second
-		runTaskTimer(Main.getInstance(), delay, period);
+
+		new TurtleCodeStepper(delay).runTaskLater(Main.getInstance(), delay);
 
 	}
+	
+	private class TurtleCodeStepper  extends BukkitRunnable {
+		private final long delay;
+		private TurtleCodeStepper(long delay) {
+			this.delay = delay;
+		}
+		@Override
+		public void run() {
+			try {
+				Object out = engine.eval("stepOneLine()");
 
-	@Override
-	public void run() {
-		try {
-//			System.out.println("Starting Run");
-//			Object out = engine.eval("myInterpreter.step()");
-			Object out = engine.eval("stepOneLine()");
+				if (out != null && (boolean) out) {
+					new TurtleCodeStepper(delay).runTaskLater(Main.getInstance(), delay);
+				}
 
+			} catch (ScriptException ex) {
+				//@note this most likely is the users code throwing the exception
+				Main.getInstance().getLogger().log(Level.SEVERE, "Turtle Code Runner Run()", ex);
 
-			
-			System.out.println("++++++"+out);
-			
-
-			if (out == null || !(boolean)out)
-				this.cancel();
-		} catch (ScriptException ex) {
-			Main.getInstance().getLogger().log(Level.SEVERE, "Turtle Code Runner Run()", ex);
-			this.cancel();
+			}
 		}
 	}
+
+	
 	
 }
