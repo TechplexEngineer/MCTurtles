@@ -36,25 +36,25 @@ public class BorderBlocks {
     }
     
     public static boolean isBorderBlock(Block b) {
-        if (b.getType() == Material.FENCE) {
-            return true; 
-        }
-       return false;               
+       return isMaterialAndData(b, Material.STAINED_CLAY, DyeColor.YELLOW.getData());             
     }
     
     public static boolean isTurtleBuildAllowBlock(Block b) {
-        return isMaterialAndData(b, Material.WOOL, DyeColor.BLUE.getData());              
+        return isMaterialAndData(b, Material.STAINED_CLAY, DyeColor.BLUE.getData());              
     }
     
     public static boolean isTurtleBuildDisallowBlock(Block b) {
-        return isMaterialAndData(b, Material.WOOL, DyeColor.ORANGE.getData());              
+        return isMaterialAndData(b, Material.STAINED_CLAY, DyeColor.ORANGE.getData());              
     }
     
     public static boolean isTurtleBorderBlock(Block b) {
-        return isMaterialAndData(b, Material.WOOL, DyeColor.RED.getData());              
+        return isMaterialAndData(b, Material.STAINED_CLAY, DyeColor.MAGENTA.getData());              
     }
     
     public static boolean isTurtleAntiBorderBlock(Block b) {
-        return isMaterialAndData(b, Material.WOOL, DyeColor.GREEN.getData());              
+        return isMaterialAndData(b, Material.STAINED_CLAY, DyeColor.GREEN.getData());              
+    }
+	public static boolean isHomeBlock(Block b) {
+        return isMaterialAndData(b, Material.STAINED_CLAY, DyeColor.BLACK.getData());              
     }
 }
