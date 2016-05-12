@@ -20,57 +20,64 @@ import org.simpleframework.http.core.Container;
  * @author techplex
  */
 public class ApiContainer implements Container {
+	private Router router;
+	public ApiContainer(Router router) {
+		this.router = router;
+	}
 
 	@Override
 	public void handle(Request req, Response res) {
 		try {
 			
-			PrintStream body = res.getPrintStream();
+//			PrintStream body = res.getPrintStream();
 			long time = System.currentTimeMillis();
 
 			res.setValue("Content-Type", "text/plain");
 			res.setValue("Server", "HelloWorld/1.0 (Simple 4.0)");
 			res.setDate("Date", time);
 			res.setDate("Last-Modified", time);
+			
+			String url = req.getPath().toString();
+			router.resolveRun(url, req, res);
 
 			
-			if (req.getPath().toString().equals("/t") && req.getMethod().equals("POST")) {
-				//@todo validate the action before adding it to the queue
-				int successCount = 0;
-				int failCount = 0;
-				String[] acts = req.getContent().split("\\n");
-				for (String content : acts) {
-					if (isValidAction(content)) {
-						WebApi.getInstance().addApiAction(new ApiAction(content));
-						successCount++;
-					} else {
-						failCount++;
-					}
-				}
-				body.println("Success: "+successCount);
-				body.println("Failure: "+failCount);
-				
-			} else if(req.getPath().toString().equals("/js/Turtle0") && req.getMethod().equals("POST")) {
-				String code = req.getContent();
-				String turtleName = "Turtle0";
-				
-				body.println("Code Exec");
-				WebApi.getInstance().addApiAction(new ApiAction(code, turtleName));
-				
-				
-				
-			} else if(req.getPath().toString().startsWith("/newTurtle"))
-			{
-				
-			}
-			else {
-				body.println("Hello World");
-				body.println(req.getPath());
-				body.println(req.getMethod());
-			}
-				
-			
-			body.close();
+//			if (req.getPath().toString().equals("/t") && req.getMethod().equals("POST")) {
+//				//@todo validate the action before adding it to the queue
+//				int successCount = 0;
+//				int failCount = 0;
+//				String[] acts = req.getContent().split("\\n");
+//				for (String content : acts) {
+//					if (isValidAction(content)) {
+//						WebApi.getInstance().addApiAction(new ApiAction(content));
+//						successCount++;
+//					} else {
+//						failCount++;
+//					}
+//				}
+//				body.println("Success: "+successCount);
+//				body.println("Failure: "+failCount);
+//				
+//			} else if(req.getPath().toString().equals("/js/Turtle0") && req.getMethod().equals("POST")) {
+//				String code = req.getContent();
+//				String turtleName = "Turtle0";
+//				
+//				body.println("Code Exec");
+//				WebApi.getInstance().addApiAction(new ApiAction(code, turtleName));
+//				
+//				
+//				
+//			} else if(req.getPath().toString().startsWith("/newTurtle"))
+//			{
+//				
+//			}
+//			else {
+//				body.println("Hello World");
+//				body.println(req.getPath());
+//				body.println(req.getMethod());
+//			}
+//				
+//			
+//			body.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

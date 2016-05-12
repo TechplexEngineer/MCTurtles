@@ -5,12 +5,15 @@
  */
 package io.techplex.turtles.web;
 
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
+
 /**
  *
  * @author techplex
  */
 public abstract class HttpAction {
 	
-	public abstract void run();
+	public abstract void run(Request req, Response res);
 	
 }
