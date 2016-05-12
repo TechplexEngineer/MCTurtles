@@ -50,6 +50,9 @@ public class TurtleCodePlugin extends JavaPlugin {
 
 		restoreTurtles();
 		
+		//modules
+		(playerMoveListener = new PlayerMoveListener(this)).registerEvents();
+		
 		pm.registerEvents(new BlockPlayerListener(), this);
         Location loc1 = new Location(getServer().getWorld("world"), -8, 62, -65);
         Location loc2 = new Location(getServer().getWorld("world"), -4, 62, -69);
@@ -66,6 +69,7 @@ public class TurtleCodePlugin extends JavaPlugin {
 		persistTurtles();
 		WebApi.getInstance().stop();
 		TurtleMgr.getInstance().cleanup();
+		//playerMoveListener = null; // not sure if I should do this or not?
 	}
 	
 	public void persistTurtles() {
