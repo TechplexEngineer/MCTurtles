@@ -1,6 +1,6 @@
 package com.tpl.turtles.scripting;
 
-import com.tpl.turtles.plumbing.Main;
+import com.tpl.turtles.plumbing.TurtleCodePlugin;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
@@ -69,7 +69,7 @@ public class Scripting {
 		
 		Thread currentThread = Thread.currentThread();
 		ClassLoader previousClassLoader = currentThread.getContextClassLoader();
-		currentThread.setContextClassLoader(Main.getInstance().getClsLdr());
+		currentThread.setContextClassLoader(TurtleCodePlugin.getInstance().getClsLdr());
 		try {
 //			ScriptEngineManager factory = new ScriptEngineManager();
 //			engine = factory.getEngineByName("JavaScript");
@@ -86,13 +86,13 @@ public class Scripting {
 			if (engine == null) {
 				System.out.println(NO_JAVASCRIPT_MESSAGE);
 			} else {
-				Main.getInstance().getLogger().info("Eval Acorn");
-				engine.eval(new FileReader(new File(Main.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "acorn.js")));
-				Main.getInstance().getLogger().info("Eval Interp");
-				engine.eval(new FileReader(new File(Main.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "interpreter.js")));
+				TurtleCodePlugin.getInstance().getLogger().info("Eval Acorn");
+				engine.eval(new FileReader(new File(TurtleCodePlugin.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "acorn.js")));
+				TurtleCodePlugin.getInstance().getLogger().info("Eval Interp");
+				engine.eval(new FileReader(new File(TurtleCodePlugin.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "interpreter.js")));
 //				Main.getInstance().getLogger().info("Eval TurtleInit");
 //				engine.eval(new FileReader(new File(Main.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "turtleinit.js")));
-				Main.getInstance().getLogger().info("Eval Done");
+				TurtleCodePlugin.getInstance().getLogger().info("Eval Done");
 				return engine;
 			}
 		} catch (Exception e) {

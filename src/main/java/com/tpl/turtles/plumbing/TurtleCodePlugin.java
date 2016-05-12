@@ -15,17 +15,19 @@ import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
 import io.techplex.borderblocks.State;
 import io.techplex.borderblocks.plumbing.BlockPlayerListener;
+import io.techplex.borderblocks.plumbing.PlayerMoveListener;
 import io.techplex.turtles.web.WebApi;
 import org.bukkit.Location;
 
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
-public class Main extends JavaPlugin {
+public class TurtleCodePlugin extends JavaPlugin {
 
-	private static Main inst;
+	private static TurtleCodePlugin inst;
 	public FileConfiguration config;
+	private PlayerMoveListener playerMoveListener;
 	
-	public static Main getInstance() {
+	public static TurtleCodePlugin getInstance() {
 		if (inst != null) {
 			return inst;
 		}

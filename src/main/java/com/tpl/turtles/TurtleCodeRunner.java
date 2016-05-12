@@ -5,7 +5,7 @@
  */
 package com.tpl.turtles;
 
-import com.tpl.turtles.plumbing.Main;
+import com.tpl.turtles.plumbing.TurtleCodePlugin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -34,21 +34,21 @@ public class TurtleCodeRunner {
 		code = code.replace("\n", "");
 		
 		try {
-			Main.getInstance().getLogger().info("Eval TurtleInit");
-			engine.eval(new FileReader(new File(Main.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "turtleinit.js")));
-			Main.getInstance().getLogger().info("Eval Done");
+			TurtleCodePlugin.getInstance().getLogger().info("Eval TurtleInit");
+			engine.eval(new FileReader(new File(TurtleCodePlugin.getInstance().getDataFolder() + File.separator + "javascript" + File.separator + "turtleinit.js")));
+			TurtleCodePlugin.getInstance().getLogger().info("Eval Done");
 			engine.eval("var myCode = '"+code+"';\n");
 		
 			engine.eval("var myInterpreter = new Interpreter(myCode, initFunc);"); // This has the nasty side effect that only one turtle per person can be operating at a time.
 		} catch (ScriptException ex) {
-			Main.getInstance().getLogger().log(Level.SEVERE, "Turtle Code Runner Constructor", ex);
+			TurtleCodePlugin.getInstance().getLogger().log(Level.SEVERE, "Turtle Code Runner Constructor", ex);
 			return;
 		} catch (FileNotFoundException ex) {
-			Main.getInstance().getLogger().log(Level.SEVERE, "File not Found", ex);
+			TurtleCodePlugin.getInstance().getLogger().log(Level.SEVERE, "File not Found", ex);
 			return;
 		}
 
-		new TurtleCodeStepper(delay).runTaskLater(Main.getInstance(), delay);
+		new TurtleCodeStepper(delay).runTaskLater(TurtleCodePlugin.getInstance(), delay);
 
 	}
 	
@@ -63,12 +63,12 @@ public class TurtleCodeRunner {
 				Object out = engine.eval("stepOneLine()");
 
 				if (out != null && (boolean) out) {
-					new TurtleCodeStepper(delay).runTaskLater(Main.getInstance(), delay);
+					new TurtleCodeStepper(delay).runTaskLater(TurtleCodePlugin.getInstance(), delay);
 				}
 
 			} catch (ScriptException ex) {
 				//@note this most likely is the users code throwing the exception
-				Main.getInstance().getLogger().log(Level.SEVERE, "Turtle Code Runner Run()", ex);
+				TurtleCodePlugin.getInstance().getLogger().log(Level.SEVERE, "Turtle Code Runner Run()", ex);
 
 			}
 		}

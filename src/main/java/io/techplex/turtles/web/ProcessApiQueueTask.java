@@ -8,7 +8,7 @@ package io.techplex.turtles.web;
 
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
-import com.tpl.turtles.plumbing.Main;
+import com.tpl.turtles.plumbing.TurtleCodePlugin;
 import java.util.Optional;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -22,12 +22,12 @@ public class ProcessApiQueueTask extends BukkitRunnable {
 	public void run() {
 		ApiAction action = WebApi.getInstance().getNextApiAction();
 		if (action != null) {
-			Main.getInstance().getLogger().warning("--------Runnable: "+action.getAction());
+			TurtleCodePlugin.getInstance().getLogger().warning("--------Runnable: "+action.getAction());
 
 			if (action.getType() == ApiAction.ApiActionType.js)
 			{
 				if (!action.getTurtleName().isPresent()) {
-					Main.getInstance().getLogger().warning("--------ERROR: No turtle name in JS api action");
+					TurtleCodePlugin.getInstance().getLogger().warning("--------ERROR: No turtle name in JS api action");
 					return;
 				}
 				Turtle t = TurtleMgr.getInstance().getByName(action.getTurtleName().get());

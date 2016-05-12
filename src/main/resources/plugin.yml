@@ -1,6 +1,6 @@
 name: MCTurtles
 author: TechplexEngineer
-main: com.tpl.turtles.plumbing.Main
+main: com.tpl.turtles.plumbing.TurtleCodePlugin
 version: 1.3
 prefix: MCTurtles
 commands:

@@ -29,7 +29,7 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.OfflinePlayer;
 
-import com.tpl.turtles.plumbing.Main;
+import com.tpl.turtles.plumbing.TurtleCodePlugin;
 import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.utils.KDebug;
 import org.bukkit.entity.Player;
@@ -733,7 +733,7 @@ public class Turtle implements ConfigurationSerializable {
 
 		if (blinkTask == null) {
 			blinkTask = new BlinkTask();
-			blinkTask.runTaskTimer(Main.getInstance(), delay, period);
+			blinkTask.runTaskTimer(TurtleCodePlugin.getInstance(), delay, period);
 		} else {
 			blinkTask.cancel();
 			blinkTask = null;

@@ -84,20 +84,20 @@ public class TurtleCMD implements CommandExecutor, TabCompleter {
 		}
 		
 		if (args[0].equalsIgnoreCase("persist")) {
-			Main.getInstance().persistTurtles();
+			TurtleCodePlugin.getInstance().persistTurtles();
 			sender.sendMessage("Persisting turtles");
 			return true;
 		}
 		
 		if (args[0].equalsIgnoreCase("restore")) {
-			int num = Main.getInstance().restoreTurtles();
+			int num = TurtleCodePlugin.getInstance().restoreTurtles();
 			sender.sendMessage("Restored "+num+" turtles");
 			return true;
 		}
 		
 		if (args[0].equalsIgnoreCase("reload")) {
-			Main.getInstance().persistTurtles();
-			Main.getInstance().restoreTurtles();
+			TurtleCodePlugin.getInstance().persistTurtles();
+			TurtleCodePlugin.getInstance().restoreTurtles();
 			return true;
 		}
 		

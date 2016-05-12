@@ -64,14 +64,18 @@ public class WebApi {
 	 */
 	public void start() {
 		
-		if (!Files.exists(new File(Main.getInstance().getDataFolder() + File.separator + "web").toPath()))
-			extractResources("web", Main.getInstance().getDataFolder());
+		if (!Files.exists(new File(TurtleCodePlugin.getInstance().getDataFolder() + File.separator + "web").toPath()))
+			extractResources("web", TurtleCodePlugin.getInstance().getDataFolder());
 
-		if (!Files.exists(new File(Main.getInstance().getDataFolder() + File.separator + "javascript").toPath()))
-			extractResources("javascript", Main.getInstance().getDataFolder());
+		if (!Files.exists(new File(TurtleCodePlugin.getInstance().getDataFolder() + File.separator + "javascript").toPath()))
+			extractResources("javascript", TurtleCodePlugin.getInstance().getDataFolder());
+		
+		Router router = new Router();
+		router.addDefaultRoute(new HomeAction());
+		router.addRoute("/manager", new TurtleManagerAction());
 		
 		try {
-			Container container = new ApiContainer();
+			Container container = new ApiContainer(router);
 			Server server = new ContainerServer(container);
 			connection = new SocketConnection(server);
 			SocketAddress address = new InetSocketAddress(8080);
@@ -84,7 +88,7 @@ public class WebApi {
 		
 		long delay = 20; //ticks to wait before scheduling (usually 20 ticks /sec)
 		long period = 20; //ticks to wait between runs
-		processor.runTaskTimer(Main.getInstance(), delay, period);
+		processor.runTaskTimer(TurtleCodePlugin.getInstance(), delay, period);
 
 	}
 	public void stop() {
