@@ -8,6 +8,7 @@ package io.techplex.turtles.web;
 import com.tpl.turtles.plumbing.TurtleCodePlugin;
 import io.techplex.turtles.web.routes.HomeAction;
 import io.techplex.turtles.web.routes.TurtleManagerAction;
+import io.techplex.turtles.web.routes.jsAction;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +76,7 @@ public class WebApi {
 		Router router = new Router();
 		router.addDefaultRoute(new HomeAction());
 		router.addRoute("/manager", new TurtleManagerAction());
+		router.addRoute("/js/([^/]+)", new jsAction());
 		
 		try {
 			Container container = new ApiContainer(router);

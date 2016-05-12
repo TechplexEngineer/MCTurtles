@@ -9,6 +9,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -27,6 +28,12 @@ public class Router {
 		routes = new HashMap<>();
 	}
 	
+	/**
+	 * Add a route to the route map.
+	 * @param route a regular expression string to act as the path. Some routes may use provided capture groups.
+	 * @param act the action to invoke if the route is matched
+	 * @return this router object to allow chaining.
+	 */
 	public Router addRoute(String route, HttpAction act) {
 		Pattern p = Pattern.compile(route);
 		
@@ -57,36 +64,38 @@ public class Router {
 	/**
 	 * Given a url path, return the matching route if found.
 	 * @param url the url path to match against the route dictionary
-	 * @return Optional HTTP action if found
+	 * @return 
 	 */
-	public Optional<HttpAction> resolve(String url) {
+	public Optional<Map.Entry<Pattern, HttpAction>> resolve(String url) {
 		
 		for (Map.Entry<Pattern, HttpAction> pair : routes.entrySet()) {
 			Pattern route = pair.getKey();
 			if (Pattern.matches(route.pattern(), url)) {
-				return Optional.of(pair.getValue());
+				return Optional.of(pair);
 			}
 			
 		}
 		return Optional.empty();
 	}
 	/**
-	 * 
-	 * @param url
-	 * @param req
-	 * @param res
+	 * Resolve the route and execute the run method of the action.
+	 * Fail over to default route if not other route matches. If no default fail
+	 * to notFoundRoute, and if no NotFoundRoute fail to printing a simple 404 message.
+	 * @param url the path of the route to match
+	 * @param req the request object for the current HTTP request
+	 * @param res the response object for the current HTTP response
 	 * @return True if routed to a route or default route, false if 404 sent.
 	 */
 	public boolean resolveRun(String url, Request req, Response res) {
-		Optional<HttpAction> act = resolve(url);
-		if (act.isPresent()) {
-			act.get().run(req,res);
+		Optional<Map.Entry<Pattern, HttpAction>> entry = resolve(url);
+		if (entry.isPresent()) {
+			entry.get().getValue().run(Optional.of(entry.get().getKey()), req, res);
 			return true;
 		} else if (defaultRoute != null) {
-			defaultRoute.run(req,res);
+			defaultRoute.run(Optional.empty(), req, res);
 			return true;
 		} else if (notFoundRoute != null) {
-			notFoundRoute.run(req,res);
+			notFoundRoute.run(Optional.empty(), req, res);
 			return true;
 		} else {
 			try {

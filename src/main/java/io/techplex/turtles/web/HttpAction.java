@@ -5,6 +5,8 @@
  */
 package io.techplex.turtles.web;
 
+import java.util.Optional;
+import java.util.regex.Pattern;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 
@@ -14,6 +16,6 @@ import org.simpleframework.http.Response;
  */
 public abstract class HttpAction {
 	
-	public abstract void run(Request req, Response res);
+	public abstract void run(Optional<Pattern> route, Request req, Response res);
 	
 }

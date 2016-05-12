@@ -9,7 +9,9 @@ import com.tpl.turtles.plumbing.TurtleCodePlugin;
 import io.techplex.turtles.web.HttpAction;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Optional;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 
@@ -20,7 +22,7 @@ import org.simpleframework.http.Response;
 public class TurtleManagerAction extends HttpAction {
 
 	@Override
-	public void run(Request req, Response res) {
+	public void run(Optional<Pattern> route, Request req, Response res) {
 		PrintStream body;
 		try {
 			body = res.getPrintStream();
