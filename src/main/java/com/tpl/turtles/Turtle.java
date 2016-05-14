@@ -1,12 +1,12 @@
 package com.tpl.turtles;
 
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.UUID;
 import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -32,8 +32,10 @@ import org.bukkit.OfflinePlayer;
 import com.tpl.turtles.plumbing.TurtleCodePlugin;
 import com.tpl.turtles.scripting.Scripting;
 import com.tpl.turtles.utils.KDebug;
+import java.util.Map.Entry;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
+import org.json.JSONObject;
+
 
 
 public class Turtle implements ConfigurationSerializable {
