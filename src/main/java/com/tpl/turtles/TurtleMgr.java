@@ -50,6 +50,20 @@ public class TurtleMgr  {
 	public List<Turtle> getTurtles() {
 		return TURTLES;
 	}
+	
+	/**
+	 * Get a list of turtles
+	 * @return a collection of turtles
+	 */
+	public List<Turtle> getPlayersTurtles(Player p) {
+		ArrayList<Turtle> playerTurtles = new ArrayList<>();
+		for (Turtle t : TURTLES) {
+			if(t.isPlayerOwner(p)) {
+				playerTurtles.add(t);
+			}
+		}
+		return playerTurtles;
+	}
     
     /**
      * Get the number of Turtles managed by this TurtleMgr
