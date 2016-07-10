@@ -5,7 +5,6 @@
  */
 package io.techplex.turtles.web.routes;
 
-import com.google.gson.Gson;
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
 import com.tpl.turtles.plumbing.TurtleCodePlugin;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;

@@ -37,7 +37,10 @@ import org.bukkit.entity.Player;
 import org.json.JSONObject;
 
 
-
+/**
+ * Represents a single turtle in world.
+ * @author techplex
+ */
 public class Turtle implements ConfigurationSerializable {
 
 	//==========================================================================

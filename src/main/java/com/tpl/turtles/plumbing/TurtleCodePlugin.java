@@ -13,9 +13,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.tpl.turtles.Turtle;
 import com.tpl.turtles.TurtleMgr;
-import io.techplex.borderblocks.State;
-import io.techplex.borderblocks.plumbing.BlockPlayerListener;
-import io.techplex.borderblocks.plumbing.PlayerMoveListener;
 import io.techplex.turtles.web.WebApi;
 import org.bukkit.Location;
 
@@ -25,7 +22,6 @@ public class TurtleCodePlugin extends JavaPlugin {
 
 	private static TurtleCodePlugin inst;
 	public FileConfiguration config;
-	private PlayerMoveListener playerMoveListener;
 	
 	public static TurtleCodePlugin getInstance() {
 		if (inst != null) {
@@ -51,12 +47,6 @@ public class TurtleCodePlugin extends JavaPlugin {
 		restoreTurtles();
 		
 		//modules
-		(playerMoveListener = new PlayerMoveListener(this)).registerEvents();
-		
-		pm.registerEvents(new BlockPlayerListener(), this);
-        Location loc1 = new Location(getServer().getWorld("world"), -8, 62, -65);
-        Location loc2 = new Location(getServer().getWorld("world"), -4, 62, -69);
-        State.getInstance().addRestrictedArea(loc1, loc2);
 		
 		WebApi.getInstance().start();
 	}
